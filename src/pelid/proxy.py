@@ -189,7 +189,12 @@ _DASHBOARD_PATH = Path(__file__).resolve().parent.parent.parent / "static" / "da
 
 @app.get("/", response_class=HTMLResponse)
 async def root_dashboard():
-    """Interactive real-time analytics dashboard loaded from static/dashboard.html."""
+    """Interactive real-time analytics dashboard loaded from static/dashboard.html, or JSON if headless."""
+    if not _DASHBOARD_PATH.exists():
+        return JSONResponse(
+            content={"service": "pelid-gateway", "status": "online", "mode": "headless_api"},
+            headers={"Cache-Control": "no-cache"},
+        )
     html_content = _DASHBOARD_PATH.read_text(encoding="utf-8")
     return HTMLResponse(
         content=html_content,

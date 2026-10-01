@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────
+# Pelid Docker Ignore File
+# Prevents any secrets, credentials, databases, personal logs,
+# or host-specific artifacts from leaking into container images.
+# ─────────────────────────────────────────────────────────────
+
+# 1. Secrets & Environment Variables (STRICTLY FORBIDDEN IN IMAGES)
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.secret
+*.token
+credentials*
+
+# 2. Local Databases & Telemetry (No runtime history baked into image)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/*.db*
+data/*.csv
+pelid_audit_telemetry.csv
+*.csv
+
+# 3. Execution Logs & Scratch Directories
+*.log
+uvicorn_*.log
+uvicorn_stdout.log
+uvicorn_stderr.log
+scratch/
+.system_generated/
+
+# 4. Virtual Environments & Local Dependencies
+venv/
+.venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# 5. Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 6. Git & Version Control
+.git/
+.gitignore
+.gitattributes
+
+# 7. IDE, Editor & OS Metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 8. Evaluation & Test Artifacts (Run outside production container)
+tests/
+test_*.py
+scripts/build_*.py
+scripts/train_*.py
+scripts/generate_*.py
