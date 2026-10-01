@@ -32,7 +32,7 @@ HOST: str = os.getenv("HOST", "127.0.0.1")
 PORT: int = int(os.getenv("PORT", "8080"))
 
 # --- Destructive action keywords ---
-# Any detected intent matching these ALWAYS goes to Path B, regardless of confidence
+# Any detected intent or query matching these ALWAYS goes to Path B, regardless of confidence
 DESTRUCTIVE_KEYWORDS: list[str] = [
     "delete",
     "remove",
@@ -44,6 +44,15 @@ DESTRUCTIVE_KEYWORDS: list[str] = [
     "purge",
     "billing_dispute",
     "shipping_address_change",
+    "auto-renewal",
+    "auto_renewal",
+    "auto renewal",
+    "auto-debit",
+    "auto_debit",
+    "auto-pay",
+    "autopay",
+    "unsubscribe",
+    "discontinue",
 ]
 
 # --- Security & Production Hardening ---

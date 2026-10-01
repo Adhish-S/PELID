@@ -100,11 +100,13 @@ class DecisionResult:
         confidence: float,
         all_probabilities: dict[str, float] | None = None,
         embedding: Optional[np.ndarray] = None,
+        query_text: str = "",
     ):
         self.label = label
         self.confidence = confidence
         self.all_probabilities = all_probabilities or {}
         self.embedding = embedding
+        self.query_text = query_text
 
     @property
     def is_confident(self) -> bool:
@@ -114,7 +116,9 @@ class DecisionResult:
     @property
     def is_destructive(self) -> bool:
         """Does this decision involve a destructive/irreversible action?"""
-        return any(keyword in self.label.lower() for keyword in DESTRUCTIVE_KEYWORDS)
+        label_match = any(keyword in self.label.lower() for keyword in DESTRUCTIVE_KEYWORDS)
+        query_match = any(keyword in self.query_text.lower() for keyword in DESTRUCTIVE_KEYWORDS) if self.query_text else False
+        return label_match or query_match
 
     @property
     def should_use_path_a(self) -> bool:
@@ -189,4 +193,5 @@ async def run_decision(text: str, language: str = "en") -> DecisionResult:
         confidence=confidence,
         all_probabilities=prob_dict,
         embedding=embedding,
+        query_text=text,
     )

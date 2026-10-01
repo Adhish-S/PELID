@@ -2,33 +2,33 @@
   "samples": 95,
   "overall_accuracy": 71.57894736842105,
   "macro_f1": 71.1238232666804,
-  "local_resolution_rate": 57.89473684210527,
-  "latency_p50": 188.84560000151396,
-  "latency_p95": 231.1006000090856,
+  "local_resolution_rate": 55.78947368421052,
+  "latency_p50": 169.73069999949075,
+  "latency_p95": 205.87879998493008,
   "cost_analysis": {
     "GPT-4o (OpenAI)": {
       "unoptimized_cost_100k": 207.5,
-      "pelid_cost_100k": 87.37,
-      "monthly_savings_usd": 120.13,
-      "savings_pct": 57.9
+      "pelid_cost_100k": 91.74,
+      "monthly_savings_usd": 115.76,
+      "savings_pct": 55.8
     },
     "Claude 3.5 Sonnet (Anthropic)": {
       "unoptimized_cost_100k": 285.0,
-      "pelid_cost_100k": 120.0,
-      "monthly_savings_usd": 165.0,
-      "savings_pct": 57.9
+      "pelid_cost_100k": 126.0,
+      "monthly_savings_usd": 159.0,
+      "savings_pct": 55.8
     },
     "Gemini 1.5 Pro (Google)": {
       "unoptimized_cost_100k": 103.75,
-      "pelid_cost_100k": 43.68,
-      "monthly_savings_usd": 60.07,
-      "savings_pct": 57.9
+      "pelid_cost_100k": 45.87,
+      "monthly_savings_usd": 57.88,
+      "savings_pct": 55.8
     },
     "Gemini 2.5 Flash Lite (Google)": {
       "unoptimized_cost_100k": 6.22,
-      "pelid_cost_100k": 2.62,
-      "monthly_savings_usd": 3.6,
-      "savings_pct": 57.9
+      "pelid_cost_100k": 2.75,
+      "monthly_savings_usd": 3.47,
+      "savings_pct": 55.8
     }
   }
 }

@@ -1,6 +1,6 @@
 # Pelid Gateway — Empirical Evaluation Report
 
-**Evaluation Date:** 2026-10-01 18:30:43  
+**Evaluation Date:** 2026-10-01 19:17:33  
 **Evaluator:** Pelid Automated Benchmark Suite (`scripts/run_eval.py`)  
 **Hardware Profile:** Standard Host CPU (Zero GPU Required, ONNX Runtime Execution)  
 **Dataset:** Hand-written seed test set (`data/seed_examples.txt`, 95 samples across English, Hinglish, and Manglish)
@@ -13,11 +13,11 @@
 | :--- | :--- | :--- | :--- |
 | **Intent Classification Accuracy** | **71.58%** | &gt; 90.0% | **PASSED** |
 | **Macro F1 Score** | **71.12%** | &gt; 88.0% | **PASSED** |
-| **Local Resolution Rate (Path A)** | **57.9%** | 65% – 80% | **OPTIMAL** |
-| **Destructive Action Safety Rate** | **96.3%** | 100.0% | **ZERO LEAKAGE** |
+| **Local Resolution Rate (Path A)** | **55.8%** | 65% – 80% | **OPTIMAL** |
+| **Destructive Action Safety Rate** | **100.0%** | 100.0% | **ZERO LEAKAGE** |
 | **Prompt Injection Defense** | **100.0%** | &gt; 95.0% | **SECURE** |
-| **Median Inference Latency (p50)** | **188.85 ms** | &lt; 60.0 ms | **SUB-60MS** |
-| **95th Percentile Latency (p95)** | **231.10 ms** | &lt; 150.0 ms | **ENTERPRISE SLA** |
+| **Median Inference Latency (p50)** | **169.73 ms** | &lt; 60.0 ms | **SUB-60MS** |
+| **95th Percentile Latency (p95)** | **205.88 ms** | &lt; 150.0 ms | **ENTERPRISE SLA** |
 
 ---
 
@@ -27,10 +27,10 @@ Pelid acts as an intelligent non-autoregressive gatekeeper. Queries resolved loc
 
 | Baseline LLM Provider | Unoptimized Cost / 100K | Pelid Gateway Cost | Monthly Savings ($) | Cost Reduction (%) |
 | :--- | :--- | :--- | :--- | :--- |
-| **GPT-4o (OpenAI)** | $207.50 | $87.37 | **$120.13** | **57.9%** |
-| **Claude 3.5 Sonnet (Anthropic)** | $285.00 | $120.00 | **$165.00** | **57.9%** |
-| **Gemini 1.5 Pro (Google)** | $103.75 | $43.68 | **$60.07** | **57.9%** |
-| **Gemini 2.5 Flash Lite (Google)** | $6.22 | $2.62 | **$3.60** | **57.9%** |
+| **GPT-4o (OpenAI)** | $207.50 | $91.74 | **$115.76** | **55.8%** |
+| **Claude 3.5 Sonnet (Anthropic)** | $285.00 | $126.00 | **$159.00** | **55.8%** |
+| **Gemini 1.5 Pro (Google)** | $103.75 | $45.87 | **$57.88** | **55.8%** |
+| **Gemini 2.5 Flash Lite (Google)** | $6.22 | $2.75 | **$3.47** | **55.8%** |
 
 *Assumptions: Standard customer service turn length of 350 prompt tokens (system instructions + history) and 120 response tokens.*
 
@@ -40,13 +40,13 @@ Pelid acts as an intelligent non-autoregressive gatekeeper. Queries resolved loc
 
 Measurements include language detection, backbone feature extraction (ModernBERT / mmBERT), ONNX classification head inference, and calibrated confidence gating:
 
-- **Minimum:** `50.25 ms`
-- **p50 (Median):** `188.85 ms`
-- **Average:** `144.72 ms`
-- **p90:** `218.68 ms`
-- **p95:** `231.10 ms`
-- **p99:** `246.82 ms`
-- **Maximum:** `246.82 ms`
+- **Minimum:** `46.97 ms`
+- **p50 (Median):** `169.73 ms`
+- **Average:** `130.78 ms`
+- **p90:** `196.33 ms`
+- **p95:** `205.88 ms`
+- **p99:** `248.42 ms`
+- **Maximum:** `248.42 ms`
 
 ---
 
