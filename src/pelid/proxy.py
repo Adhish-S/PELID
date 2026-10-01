@@ -182,10 +182,7 @@ async def export_audit_csv():
 
 # ─── 2. Real-Time Executive Dashboard ─────────────────────────
 
-@app.get("/", response_class=HTMLResponse)
-async def root_dashboard():
-    """Interactive real-time analytics dashboard."""
-    return """
+DASHBOARD_HTML = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -478,7 +475,7 @@ async def root_dashboard():
                 <div class="kpi-card">
                     <div class="kpi-title">Total Intercepted</div>
                     <div class="kpi-value" id="kpi-total">0</div>
-                    <div class="kpi-sub">OpenAI completion calls</div>
+                    <div class="kpi-sub">Total Requests</div>
                 </div>
                 <div class="kpi-card highlight">
                     <div class="kpi-title">Local Resolution Rate</div>
@@ -493,7 +490,7 @@ async def root_dashboard():
                 <div class="kpi-card highlight">
                     <div class="kpi-title">Session Cost Saved</div>
                     <div class="kpi-value" id="kpi-cost" style="color: var(--success);">$0.0000</div>
-                    <div class="kpi-sub" id="kpi-tokens-sub">0 tokens saved vs GPT-4o</div>
+                    <div class="kpi-sub" id="kpi-tokens-sub">0 tokens saved vs Frontier LLM</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-title">Projected Monthly Savings</div>
@@ -510,16 +507,18 @@ async def root_dashboard():
             <!-- Interactive Tester Box -->
             <div class="test-panel">
                 <div class="test-panel-title">
-                    <span>🧪 Live Sandbox Tester (SSE Streaming & Multi-Turn Ready)</span>
+                    <span>🧪 Live Sandbox Tester (Vernacular Triage & Entity Resolution)</span>
                     <label class="stream-toggle-label">
-                        <input type="checkbox" id="stream-toggle" checked>
-                        <span>Enable OpenAI SSE Streaming (stream: true)</span>
+                        <input type="checkbox" id="stream-toggle">
+                        <span>Real-time typewriter streaming</span>
                     </label>
                 </div>
-                <div class="test-box">
-                    <input type="text" id="test-query" class="test-input" placeholder="Enter query in English, Hinglish, or Manglish..." autofocus>
-                    <button class="test-btn" onclick="sendTestQuery()">Send Request</button>
-                </div>
+                <form id="test-form" onsubmit="event.preventDefault(); sendTestQuery();">
+                    <div class="test-box">
+                        <input type="text" id="test-query" class="test-input" placeholder="Enter query in English, Hinglish, or Manglish (e.g. 'where is my order')..." autocomplete="off" autofocus>
+                        <button type="submit" id="test-submit-btn" class="test-btn">Send Request</button>
+                    </div>
+                </form>
                 <div class="chips">
                     <span class="chips-label">Quick samples:</span>
                     <span class="chip" onclick="fillQuery('Where is my order #9921?')">#9921 Order Lookup</span>
@@ -600,7 +599,7 @@ async def root_dashboard():
                     document.getElementById('kpi-total').innerText = s.total_requests;
                     document.getElementById('kpi-rate').innerText = s.local_resolution_rate + '%';
                     document.getElementById('kpi-cost').innerText = '$' + s.total_cost_saved_usd.toFixed(4);
-                    document.getElementById('kpi-tokens-sub').innerText = s.total_tokens_saved + ' tokens saved vs GPT-4o';
+                    document.getElementById('kpi-tokens-sub').innerText = s.total_tokens_saved + ' tokens saved vs Frontier LLM';
                     document.getElementById('kpi-projected').innerText = '$' + s.projected_monthly_savings_100k.toLocaleString(undefined, {minimumFractionDigits: 2});
                     
                     document.getElementById('kpi-cache-hits').innerText = c.total_hits || 0;
@@ -658,21 +657,24 @@ async def root_dashboard():
 
             async function sendTestQuery() {
                 const input = document.getElementById('test-query');
+                const btn = document.getElementById('test-submit-btn');
                 const q = input.value.trim();
                 if (!q) return;
 
-                const isStream = document.getElementById('stream-toggle').checked;
+                const streamCheck = document.getElementById('stream-toggle');
+                const isStream = streamCheck ? streamCheck.checked : false;
                 const container = document.getElementById('test-response-container');
                 const respText = document.getElementById('test-response-text');
                 const respPill = document.getElementById('response-meta-pill');
 
                 container.style.display = 'block';
-                respText.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">⚡ Connecting to Pelid Gateway...</span>';
+                respText.innerHTML = '<span style="color: var(--primary); font-weight: 500;">⚡ Evaluating query with Pelid Gateway...</span>';
                 respPill.innerText = 'Evaluating...';
                 respPill.style.background = 'rgba(56, 189, 248, 0.2)';
                 respPill.style.color = 'var(--primary)';
 
                 input.disabled = true;
+                if (btn) btn.disabled = true;
                 const t0 = performance.now();
 
                 try {
@@ -680,7 +682,7 @@ async def root_dashboard():
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'gpt-4o',
+                            model: 'pelid-auto',
                             stream: isStream,
                             messages: [{ role: 'user', content: q }]
                         })
@@ -693,7 +695,7 @@ async def root_dashboard():
                             errText = (errJson.error && errJson.error.message) || errText;
                         } catch (_) {}
                         respText.innerHTML = `<span style="color: var(--danger); font-weight: 600;">${errText}</span>`;
-                        respPill.innerText = `HTTP ${res.status} Error`;
+                        respPill.innerText = `Error ${res.status}`;
                         respPill.style.background = 'rgba(248, 113, 113, 0.2)';
                         respPill.style.color = 'var(--danger)';
                         return;
@@ -704,8 +706,9 @@ async def root_dashboard():
                         const decoder = new TextDecoder();
                         let buffer = '';
                         let hasStarted = false;
+                        let streamCompleted = false;
 
-                        while (true) {
+                        while (!streamCompleted) {
                             const { done, value } = await reader.read();
                             if (done) break;
                             buffer += decoder.decode(value, { stream: true });
@@ -714,7 +717,11 @@ async def root_dashboard():
 
                             for (const line of lines) {
                                 const trimmed = line.trim();
-                                if (!trimmed || trimmed === 'data: [DONE]') continue;
+                                if (!trimmed) continue;
+                                if (trimmed === 'data: [DONE]') {
+                                    streamCompleted = true;
+                                    break;
+                                }
                                 if (trimmed.startsWith('data: ')) {
                                     try {
                                         const parsed = JSON.parse(trimmed.slice(6));
@@ -732,53 +739,41 @@ async def root_dashboard():
                         }
 
                         const elapsed = Math.round(performance.now() - t0);
-                        respPill.innerText = `STREAM COMPLETED · ~${elapsed}ms · OpenAI SSE Protocol`;
+                        respPill.innerText = `STREAM COMPLETED · ~${elapsed}ms`;
                         respPill.style.background = 'rgba(52, 211, 153, 0.2)';
                         respPill.style.color = 'var(--success)';
                     } else {
-                        let data;
-                        try {
-                            data = await res.json();
-                        } catch (jsonErr) {
-                            const rawText = await res.text();
-                            data = { error: { message: rawText || 'Server returned non-JSON response' } };
-                        }
+                        const data = await res.json();
+                        const content = data.choices && data.choices[0] && data.choices[0].message
+                            ? data.choices[0].message.content
+                            : (data.error ? data.error.message : JSON.stringify(data));
+                        
+                        const meta = data.pelid_metadata || {};
+                        respText.innerText = content;
 
-                        if (data.error) {
-                            const errMsg = data.error.message || JSON.stringify(data.error);
-                            respText.innerText = 'Notice: ' + errMsg;
-                            respPill.innerText = `PATH B (FRONTIER) · Upstream Status ${res.status}`;
-                            respPill.style.background = 'rgba(251, 191, 36, 0.2)';
-                            respPill.style.color = 'var(--warning)';
+                        if (meta.path === 'A') {
+                            const cacheTag = meta.cache_hit ? `⚡ CACHE HIT (${meta.cache_hit})` : 'PATH A (LOCAL)';
+                            respPill.innerText = `${cacheTag} · ${meta.intent} · ${(meta.confidence * 100).toFixed(0)}% · ${meta.latency_ms || 30}ms · $0.00`;
+                            respPill.style.background = meta.cache_hit ? 'rgba(192, 132, 252, 0.2)' : 'rgba(52, 211, 153, 0.2)';
+                            respPill.style.color = meta.cache_hit ? 'var(--purple)' : 'var(--success)';
                         } else {
-                            const content = data.choices && data.choices[0] && data.choices[0].message
-                                ? data.choices[0].message.content
-                                : JSON.stringify(data);
-                            const meta = data.pelid_metadata || {};
-                            respText.innerText = content;
-
-                            if (meta.path === 'A') {
-                                const cacheTag = meta.cache_hit ? `⚡ CACHE HIT (${meta.cache_hit})` : 'PATH A (LOCAL)';
-                                respPill.innerText = `${cacheTag} · ${meta.intent} · ${(meta.confidence * 100).toFixed(0)}% · ${meta.latency_ms || 30}ms · $0.00`;
-                                respPill.style.background = meta.cache_hit ? 'rgba(192, 132, 252, 0.2)' : 'rgba(52, 211, 153, 0.2)';
-                                respPill.style.color = meta.cache_hit ? 'var(--purple)' : 'var(--success)';
-                            } else {
-                                respPill.innerText = `PATH B (FRONTIER LLM) · Escalated to Upstream`;
-                                respPill.style.background = 'rgba(248, 113, 113, 0.2)';
-                                respPill.style.color = 'var(--danger)';
-                            }
+                            const reasonStr = meta.reason || 'Escalated to Frontier LLM';
+                            respPill.innerText = `PATH B (FRONTIER LLM) · ${reasonStr}`;
+                            respPill.style.background = 'rgba(248, 113, 113, 0.2)';
+                            respPill.style.color = 'var(--danger)';
                         }
                     }
 
                     input.value = '';
                     fetchStats();
                 } catch (e) {
-                    respText.innerHTML = `<span style="color: var(--danger); font-weight: 600;">Network Error: ${e.message || e}. Ensure proxy is running on port 8080.</span>`;
+                    respText.innerHTML = `<span style="color: var(--danger); font-weight: 600;">Request Error: ${e.message || e}. Ensure proxy is running on port 8080.</span>`;
                     respPill.innerText = 'Connection Error';
                     respPill.style.background = 'rgba(248, 113, 113, 0.2)';
                     respPill.style.color = 'var(--danger)';
                 } finally {
                     input.disabled = false;
+                    if (btn) btn.disabled = false;
                     input.focus();
                 }
             }
@@ -797,6 +792,19 @@ async def root_dashboard():
     </body>
     </html>
     """
+
+
+@app.get("/", response_class=HTMLResponse)
+async def root_dashboard():
+    """Interactive real-time analytics dashboard with strict no-cache headers."""
+    return HTMLResponse(
+        content=DASHBOARD_HTML,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
 # ─── 3. SSE Stream Generators ────────────────────────────────
