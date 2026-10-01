@@ -34,6 +34,8 @@ from pelid.config import (
     PELID_PROXY_API_KEY,
     ENABLE_INJECTION_SHIELD,
     MAX_PAYLOAD_BYTES,
+    RATE_LIMIT_PER_MINUTE,
+    ENABLE_PII_REDACTION,
     SHADOW_MODE,
 )
 from pelid.context_budget import count_tokens, is_within_budget
@@ -50,7 +52,7 @@ from pelid.db import (
 )
 from pelid.mock_crm import extract_order_id
 from pelid.responder import resolve_path_a_response
-from pelid.security import is_prompt_injection, validate_api_key
+from pelid.security import is_prompt_injection, validate_api_key, anonymize_pii, SlidingWindowRateLimiter
 from pelid.session import synthesize_multi_turn_query
 
 app = FastAPI(
@@ -67,6 +69,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Sliding window rate limiter (configurable per client IP)
+rate_limiter = SlidingWindowRateLimiter(max_requests_per_minute=RATE_LIMIT_PER_MINUTE)
 
 
 @app.on_event("startup")
@@ -324,6 +329,16 @@ async def chat_completions(request: Request):
             content={"error": {"message": f"Payload exceeds limit of {MAX_PAYLOAD_BYTES} bytes", "type": "payload_too_large"}},
         )
 
+    # Step 0C: Sliding-Window Rate Limiting (Abuse & runaway agent loop protection)
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    allowed, retry_after = rate_limiter.is_allowed(client_ip)
+    if not allowed:
+        return JSONResponse(
+            status_code=429,
+            content={"error": {"message": f"Rate limit exceeded ({RATE_LIMIT_PER_MINUTE} req/min). Retry in {retry_after}s.", "type": "rate_limit_error"}},
+            headers={"Retry-After": str(retry_after)},
+        )
+
     try:
         body = json.loads(raw_body.decode("utf-8"))
     except Exception as e:
@@ -554,6 +569,18 @@ async def forward_to_upstream(
     forward_body = dict(body)
     if UPSTREAM_MODEL:
         forward_body["model"] = UPSTREAM_MODEL
+
+    # Anonymize sensitive PII (credit cards, phone numbers, emails) before leaving to frontier LLM
+    if ENABLE_PII_REDACTION and "messages" in forward_body and isinstance(forward_body["messages"], list):
+        sanitized_messages = []
+        for msg in forward_body["messages"]:
+            if isinstance(msg, dict) and "content" in msg and isinstance(msg["content"], str):
+                msg_copy = dict(msg)
+                msg_copy["content"] = anonymize_pii(msg["content"])
+                sanitized_messages.append(msg_copy)
+            else:
+                sanitized_messages.append(msg)
+        forward_body["messages"] = sanitized_messages
 
     headers = {
         "Authorization": f"Bearer {GEMINI_API_KEY}",

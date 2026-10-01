@@ -63,3 +63,77 @@ def validate_api_key(auth_header: Optional[str], expected_key: str) -> bool:
 
     token = parts[1]
     return hmac.compare_digest(token, expected_key)
+
+
+# ─── PII Redaction / Anonymization Filter ────────────────────
+
+# Regex patterns for high-sensitivity data
+PII_PATTERNS = [
+    # 16-digit credit / debit card numbers (with spaces, hyphens, or continuous)
+    (re.compile(r"\b(?:\d{4}[ -]?){3}\d{4}\b"), "[REDACTED_CARD]"),
+    # Standard email addresses
+    (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"), "[REDACTED_EMAIL]"),
+    # 10-digit Indian & international mobile numbers
+    (re.compile(r"\b(?:\+?91[-.\s]?)?[6-9]\d{9}\b"), "[REDACTED_PHONE]"),
+    # US / International 10-digit phone numbers
+    (re.compile(r"\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"), "[REDACTED_PHONE]"),
+]
+
+
+def anonymize_pii(text: str) -> str:
+    """
+    Sanitize sensitive user PII (credit cards, phone numbers, emails)
+    before forwarding queries to external third-party foundation models on Path B.
+    Ensures GDPR / HIPAA data leakage compliance.
+    """
+    if not text:
+        return ""
+    sanitized = text
+    for pattern, replacement in PII_PATTERNS:
+        sanitized = pattern.sub(replacement, sanitized)
+    return sanitized
+
+
+# ─── In-Memory Sliding Window Rate Limiter ───────────────────
+
+import time
+from collections import defaultdict
+
+
+class SlidingWindowRateLimiter:
+    """
+    In-memory, sliding-window rate limiter per client IP address.
+    Protects the gateway against runaway agent loops, accidental spam, and DoS.
+    """
+
+    def __init__(self, max_requests_per_minute: int = 120):
+        self.max_requests = max_requests_per_minute
+        self.requests = defaultdict(list)
+
+    def is_allowed(self, client_ip: str) -> tuple[bool, int]:
+        """
+        Check if client_ip is within the rate limit.
+
+        Returns:
+            (allowed: bool, retry_after_seconds: int)
+        """
+        # If rate limiting is disabled (0 or negative), allow immediately
+        if self.max_requests <= 0:
+            return True, 0
+
+        now = time.time()
+        window_start = now - 60.0
+
+        # Clean old timestamps outside the 60s sliding window
+        self.requests[client_ip] = [ts for ts in self.requests[client_ip] if ts > window_start]
+
+        if len(self.requests[client_ip]) >= self.max_requests:
+            # Calculate time until earliest timestamp expires
+            earliest = self.requests[client_ip][0]
+            retry_after = max(1, int(60.0 - (now - earliest)))
+            return False, retry_after
+
+        # Record this request
+        self.requests[client_ip].append(now)
+        return True, 0
+

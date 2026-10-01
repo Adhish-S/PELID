@@ -65,6 +65,12 @@ ENABLE_INJECTION_SHIELD: bool = os.getenv("ENABLE_INJECTION_SHIELD", "true").low
 # Maximum raw payload size in bytes (prevents memory exhaustion DoS)
 MAX_PAYLOAD_BYTES: int = int(os.getenv("MAX_PAYLOAD_BYTES", "65536"))
 
+# Rate limiting (requests per minute per client IP, 0 = disabled)
+RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
+
+# Anonymize PII (credit cards, phone numbers, emails) before sending to Path B
+ENABLE_PII_REDACTION: bool = os.getenv("ENABLE_PII_REDACTION", "true").lower() == "true"
+
 # Shadow Mode: Mirror traffic and audit savings without blocking or answering locally
 SHADOW_MODE: bool = os.getenv("SHADOW_MODE", "false").lower() == "true"
 

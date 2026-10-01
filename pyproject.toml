@@ -22,5 +22,8 @@ dependencies = [
     "transformers>=4.40.0",
 ]
 
+[project.scripts]
+pelid = "pelid.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
