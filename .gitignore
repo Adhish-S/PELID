@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Pelid Gateway Local State & Telemetry DB
+data/*.db
+data/*.sqlite
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.onnx.data
+*.csv
+!data/training_data.csv
+*.log
+.env
+.env.*
+!.env.example
+
+
+

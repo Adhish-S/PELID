@@ -1,0 +1,30 @@
+{
+  "in_features": 768,
+  "num_classes": 21,
+  "labels": [
+    "billing_dispute",
+    "cancel_order",
+    "cancel_subscription",
+    "complaint_or_escalate_to_human",
+    "delete_account",
+    "feature_request_or_feedback",
+    "general_chitchat_or_faq",
+    "how_to_question",
+    "invoice_or_receipt",
+    "login_or_password_issue",
+    "order_delayed_or_missing",
+    "order_status",
+    "other_unclear",
+    "payment_failure",
+    "pricing_or_plan_question",
+    "refund_request",
+    "return_or_exchange",
+    "shipping_address_change",
+    "technical_bug_report",
+    "update_account_details",
+    "wrong_or_defective_item"
+  ],
+  "temperature": 0.9959840178489685,
+  "test_accuracy": 100.0,
+  "calibrated_ece": 0.0002480745315551758
+}

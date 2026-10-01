@@ -5,16 +5,18 @@ All thresholds and URLs are defined here so they're easy to find and change.
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load variables from .env file (if it exists) into environment
-load_dotenv()
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+# Load variables from project root .env file into environment
+load_dotenv(PROJECT_ROOT / ".env", override=True)
 
 
 # --- Path B (Frontier LLM) settings ---
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 UPSTREAM_BASE_URL: str = os.getenv("UPSTREAM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai")
-UPSTREAM_MODEL: str = os.getenv("UPSTREAM_MODEL", "gemini-2.0-flash")
+UPSTREAM_MODEL: str = os.getenv("UPSTREAM_MODEL", "gemini-3.5-flash-lite")
 
 # --- Decision thresholds ---
 # If Laya's confidence is >= this value, use the local answer (Path A)
@@ -40,4 +42,20 @@ DESTRUCTIVE_KEYWORDS: list[str] = [
     "close_account",
     "revoke",
     "purge",
+    "billing_dispute",
+    "shipping_address_change",
 ]
+
+# --- Security & Production Hardening ---
+# Optional Bearer token to protect this gateway from unauthorized access
+PELID_PROXY_API_KEY: str = os.getenv("PELID_PROXY_API_KEY", "")
+
+# Block or escalate adversarial prompt injections and jailbreaks
+ENABLE_INJECTION_SHIELD: bool = os.getenv("ENABLE_INJECTION_SHIELD", "true").lower() == "true"
+
+# Maximum raw payload size in bytes (prevents memory exhaustion DoS)
+MAX_PAYLOAD_BYTES: int = int(os.getenv("MAX_PAYLOAD_BYTES", "65536"))
+
+# Shadow Mode: Mirror traffic and audit savings without blocking or answering locally
+SHADOW_MODE: bool = os.getenv("SHADOW_MODE", "false").lower() == "true"
+

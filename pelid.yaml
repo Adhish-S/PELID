@@ -1,0 +1,66 @@
+# Pelid Multi-Domain Configuration Manifest
+# Define your domain, custom intents, and destructive action safety rules.
+
+active_domain: ecommerce
+
+domains:
+  ecommerce:
+    name: "E-Commerce & Retail Logistics"
+    description: "Post-purchase customer support, parcel tracking, returns, and billing"
+    intents:
+      safe:
+        - order_status
+        - order_delayed_or_missing
+        - wrong_or_defective_item
+        - return_or_exchange
+        - payment_failure
+        - invoice_or_receipt
+        - login_or_password_issue
+        - how_to_question
+        - pricing_or_plan_question
+        - feature_request_or_feedback
+        - general_chitchat_or_faq
+      destructive:
+        - cancel_order
+        - cancel_subscription
+        - refund_request
+        - billing_dispute
+        - delete_account
+        - shipping_address_change
+
+  food_delivery:
+    name: "On-Demand Food & Quick-Commerce"
+    description: "Real-time delivery partner tracking, live kitchen prep, spills, and cold items"
+    intents:
+      safe:
+        - live_driver_location
+        - restaurant_prep_delay
+        - missing_condiment_or_sauce
+        - food_temperature_issue
+        - packaging_damaged_spilled
+        - delivery_partner_unreachable
+        - allergies_or_dietary_query
+        - apply_promo_code
+        - tip_delivery_executive
+      destructive:
+        - cancel_live_kitchen_order
+        - food_poisoning_critical_escalation
+        - full_order_refund
+        - chargeback_dispute
+
+  b2b_manufacturing:
+    name: "Industrial B2B & Supply Chain"
+    description: "Purchase orders, raw material inventory, spec sheets, and supplier RMA"
+    intents:
+      safe:
+        - purchase_order_status
+        - raw_material_lead_time
+        - download_cad_spec_sheet
+        - compliance_certificate_request
+        - warehouse_stock_inquiry
+        - minimum_order_quantity_check
+      destructive:
+        - cancel_bulk_procurement_po
+        - warranty_supplier_rma
+        - factory_downtime_critical_incident
+        - legal_contract_termination

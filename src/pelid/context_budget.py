@@ -17,6 +17,22 @@ from pelid.config import CONTEXT_BUDGET_TOKENS
 # Use tiktoken to count tokens in the relevant parts of the request
 
 
+try:
+    _tokenizer = tiktoken.get_encoding("cl100k_base")
+except Exception:
+    _tokenizer = None
+
+
+def count_tokens(text: str) -> int:
+    """Count tokens in input text."""
+    if not text:
+        return 0
+    if _tokenizer:
+        return len(_tokenizer.encode(text))
+    # Approximation: ~4 chars per token
+    return max(1, len(text) // 4)
+
+
 def is_within_budget(text: str) -> bool:
     """
     Check if the input text is short enough for Laya to handle.
@@ -28,7 +44,6 @@ def is_within_budget(text: str) -> bool:
         True if within budget (can go to Tier 0 / Laya).
         False if too long (must go to Path B).
     """
-    # TODO: Implement token counting
-    # For now, use a simple character-based estimate as placeholder
-    # Real implementation should use tiktoken for accurate counting
-    return False
+    if not text:
+        return True
+    return count_tokens(text) <= CONTEXT_BUDGET_TOKENS

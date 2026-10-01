@@ -1,0 +1,1102 @@
+label,message
+order_status,Where is my order #89214? check status
+order_status,Order tracking details please send on WhatsApp
+order_status,Mera order kab deliver hoga?
+order_status,Order #89214 ka live status dikhao
+order_status,Ente order eppo kittum? Track link thaa
+order_status,Can you check the dispatch status of my package #44102?
+order_status,"Tracking link is not updating, where is my package currently?"
+order_status,Status batao order ka please
+order_status,Order #19283 status update
+order_status,When is the estimated delivery date for parcel #7712?
+order_status,Mera courier kahan tak pahuncha bhai?
+order_status,Check courier status for tracking number BLR9921
+order_status,Ente parcel ippo evide ethi?
+order_status,"Tracking status showing dispatched since 2 days, any update?"
+order_status,Can you provide the live location of my package?
+order_status,Live location tracking link bhejo
+order_status,Where is my consignment?
+order_status,Delivery date eppozhaanu?
+order_status,Order #55210 track cheyyan pattumo?
+order_status,Has my order been shipped yet?
+order_status,Shipment status check please
+order_status,Order dispatch hua ya nahi abhi tak?
+order_status,Kindly provide delivery boy contact number
+order_status,Delivery partner details send karo
+order_status,Ente order dispatch aayo?
+order_status,Please check if order #66781 will arrive today
+order_status,Aaj deliver hoga kya mera parcel?
+order_status,"Order tracking link not working, please help"
+order_status,Expected arrival time of my package please
+order_status,Kab tak aayega order #9001?
+order_status,Track my delivery please
+order_status,Enikku live tracking details venam
+order_status,Is order #81293 delayed or on time?
+order_status,Tell me delivery ETA for order #3129
+order_status,Kittan late aakumo delivery?
+order_status,Status check karo order number #10294
+order_status,Where has my delivery reached?
+order_status,Parcel tracking status refresh nahi ho raha
+order_status,Any update on delivery for BLR-9982?
+order_status,Current location of package #7821?
+order_status,Mera saman kab aayega ghar pe?
+order_status,Delivery boy ka number milega?
+order_status,"Order tracking shows out for delivery, what time today?"
+order_status,Today delivery expected aano?
+order_status,Could you check order #6091 status for me?
+order_status,Bhai shipment status update do
+order_status,Tracking details eppo update aakum?
+order_status,Please confirm delivery schedule for order #71294
+order_status,Where is order #3301 right now?
+order_status,Order track cheyyanulla link tharuo?
+order_status,Will my package arrive before 5 PM today?
+order_status,aree mera oreder kahaa hai?
+order_status,wherre is my order
+order_status,eda ennte package eedeya ulle?
+order_status,where is my order
+order_status,where is my package
+order_status,mera order kahaa hai bhai?
+order_status,Where is my order #9921?
+order_status,ennte package eedeya ulle?
+order_status,kahaa hai mera order
+order_status,oreder status track karo
+order_status,ennte order evide?
+order_status,ente order evide?
+order_status,mera order kahan hai?
+order_delayed_or_missing,Status shows delivered but I have not received the parcel!
+order_delayed_or_missing,"Order was supposed to arrive yesterday, still showing in transit"
+order_delayed_or_missing,"3 din se out for delivery bol rahe ho, abhi tak aaya nahi"
+order_delayed_or_missing,"Delivery boy phone nahi utha raha, order late hai"
+order_delayed_or_missing,Item vannitilla pakshe appil delivered ennu kaanikunnu
+order_delayed_or_missing,"My parcel is 4 days late, what is going on?"
+order_delayed_or_missing,Marked as delivered but no one came to my house
+order_delayed_or_missing,"App says delivered at 4 PM, I was home all day and nobody rang the bell"
+order_delayed_or_missing,"Order late ho gaya bohot, cancel hone se pehle bhej do"
+order_delayed_or_missing,Delivery partner marked delivered without calling me
+order_delayed_or_missing,"Item kittiyilla, fake delivery update aanu"
+order_delayed_or_missing,Where is my delivery? It was promised by Friday
+order_delayed_or_missing,"Still waiting for parcel #9910, already 3 days past ETA"
+order_delayed_or_missing,"Order deliver nahi hua aur message aaya delivered, why?"
+order_delayed_or_missing,"Nobody delivered the package, OTP was not even shared"
+order_delayed_or_missing,"Appil delivered ennu vannu, delivery person vilichilla"
+order_delayed_or_missing,Out for delivery status stuck for 48 hours
+order_delayed_or_missing,"Delivery driver is rejecting my calls, parcel delayed"
+order_delayed_or_missing,"Parcel missing lag raha hai, koi update nahi aa raha"
+order_delayed_or_missing,"Package seems lost in transit, please investigate"
+order_delayed_or_missing,"Delivery boy says he will deliver tomorrow, but status is delivered"
+order_delayed_or_missing,Fake delivery attempt recorded by courier partner
+order_delayed_or_missing,"Doorstep delivery vannilla, fraud update"
+order_delayed_or_missing,Why is order #55123 taking more than a week?
+order_delayed_or_missing,Delivery date keep postponing everyday
+order_delayed_or_missing,Har roz date aage badha dete ho delivery ka
+order_delayed_or_missing,"Tracking shows delayed due to operational issues, explain please"
+order_delayed_or_missing,Ente parcel lost aayathano? Too much delay
+order_delayed_or_missing,"Parcel has not arrived yet, very poor delivery service"
+order_delayed_or_missing,Delivery agent marked customer not available without visiting
+order_delayed_or_missing,Bina aaye customer unavailable mark kar diya
+order_delayed_or_missing,"Customer unavailable ennu kaanikkunnu, aarum vannilla"
+order_delayed_or_missing,Where is my late package? Urgently needed
+order_delayed_or_missing,Still haven't received package #88123
+order_delayed_or_missing,Courier wale ne parcel deliver nahi kiya
+order_delayed_or_missing,My shipment #3102 is stuck at Bangalore sorting center for 5 days
+order_delayed_or_missing,Hub il ninn parcel move aavunnilla 4 days aayi
+order_delayed_or_missing,"Stuck at local hub, when will it reach me?"
+order_delayed_or_missing,"Order missing hai, security guard ke paas bhi nahi hai"
+order_delayed_or_missing,Delivered notification received but delivery box is empty
+order_delayed_or_missing,I suspect my courier has been stolen or misplaced
+order_delayed_or_missing,Delivery person switched off phone after promising 10 min
+order_delayed_or_missing,Phone switch off aanu delivery boyde
+order_delayed_or_missing,"Delayed shipment #90812, please escalate to delivery team"
+order_delayed_or_missing,"Bohot late ho gaya order, do something quickly"
+order_delayed_or_missing,Why is delivery taking so long this time?
+order_delayed_or_missing,Missing package complaint register karni hai
+order_delayed_or_missing,"Parcel kanmanilla, complaint raise cheyyanam"
+order_delayed_or_missing,"Expected delivery was 26th September, today is 29th, where is it?"
+order_delayed_or_missing,"Order track record stopped 3 days back, is it lost?"
+order_delayed_or_missing,Delivery boy fake status daal raha hai
+order_delayed_or_missing,Late delivery complaint for order #88910
+wrong_or_defective_item,Received wrong size XL instead of medium
+wrong_or_defective_item,Box was damaged and screen is completely cracked on arrival
+wrong_or_defective_item,"Galat product bhej diya, red ki jagah blue shirt aaya hai"
+wrong_or_defective_item,"Seal pehle se khula hua tha, used item lag raha hai"
+wrong_or_defective_item,"Kittiya item damaged aan, device on aavnnilla"
+wrong_or_defective_item,I ordered a wireless headphone but received wired earphones
+wrong_or_defective_item,The package arrived crushed and the bottle inside is broken
+wrong_or_defective_item,"Liquid leaked all inside the box, parcel completely spoiled"
+wrong_or_defective_item,Product color does not match what was shown in the app
+wrong_or_defective_item,Different model delivered for order #8872
+wrong_or_defective_item,"Wrong product delivery, box contains different brand altogether"
+wrong_or_defective_item,"Galat saaman bheja hai, maine shoes mangwaye the t-shirt aayi"
+wrong_or_defective_item,"Item damaged hai, screen pe scratches hai"
+wrong_or_defective_item,"Received defective speaker, no sound coming out"
+wrong_or_defective_item,"Appil kandathalla kittiyathu, totally different color"
+wrong_or_defective_item,Broken pieces inside the delivery box
+wrong_or_defective_item,"Item is missing parts, charging cable is not inside the box"
+wrong_or_defective_item,Accessories gayab hai box me se
+wrong_or_defective_item,Only 1 item received out of 2 ordered items in package #4412
+wrong_or_defective_item,Ek item missing hai packet me
+wrong_or_defective_item,Seal was tampered and item looks already used by someone
+wrong_or_defective_item,"Defective piece delivered, button is broken"
+wrong_or_defective_item,Kittiya dressinte stitch potti kidakkukayanu
+wrong_or_defective_item,"Torn clothes delivered, want immediate replacement"
+wrong_or_defective_item,Expired food item delivered in grocery order #1920
+wrong_or_defective_item,"Expiry date passed already, please check"
+wrong_or_defective_item,Product physically broken into two halves
+wrong_or_defective_item,"Product switched, received duplicate duplicate copy"
+wrong_or_defective_item,"Faulty electronic gadget, power led is blinking red"
+wrong_or_defective_item,"Device switch on aakunnilla, defective item"
+wrong_or_defective_item,"Wrong shoe size, box says UK 9 but inside shoe is UK 7"
+wrong_or_defective_item,"Size issue, wrong size delivered"
+wrong_or_defective_item,"Wrong item delivered, please arrange pickup and send correct one"
+wrong_or_defective_item,"Mujhe galat item bhej diya hai, photo upload kahan karu?"
+wrong_or_defective_item,Where can I upload photos of the damaged product?
+wrong_or_defective_item,"Damage proof photos ready aanu, replacement tharumo?"
+wrong_or_defective_item,The phone camera lens is scratched in the sealed box
+wrong_or_defective_item,Sent me cheap plastic item instead of metal item
+wrong_or_defective_item,"Duplicate product received, not genuine original"
+wrong_or_defective_item,"Asli product nahi hai ye, fake copy lag rahi hai"
+wrong_or_defective_item,Fabric quality is damaged and torn near pocket
+wrong_or_defective_item,Half spilled shampoo bottle received
+wrong_or_defective_item,Oil bottle potti theernnu parcelil
+wrong_or_defective_item,Missing user manual and warranty card inside
+wrong_or_defective_item,Received empty box with only packaging paper inside!
+wrong_or_defective_item,Khaali dabba bhej diya delivery boy ne
+wrong_or_defective_item,"Empty box delivery fraud, I want immediate resolution"
+wrong_or_defective_item,Manufacturing defect in the mixer grinder motor
+wrong_or_defective_item,Item not working properly from day one
+wrong_or_defective_item,Defective item complaint for order #66219
+wrong_or_defective_item,"Wrong color delivered, ordered black received white"
+wrong_or_defective_item,ennte package pottiya vannath.
+wrong_or_defective_item,"package pottiya vannath, damage aayi"
+wrong_or_defective_item,mera glass damaged aaya
+wrong_or_defective_item,"box potti poyi, damaged aayi vannu"
+wrong_or_defective_item,ennte parcel potti kidakkukayanu
+wrong_or_defective_item,"item pottiya vannath, replace cheyyo"
+wrong_or_defective_item,aree mera package tuuta hua hai
+wrong_or_defective_item,mera package toota hua aaya hai
+wrong_or_defective_item,package toota hua hai
+wrong_or_defective_item,dabba toota hua hai aur item damaged hai
+wrong_or_defective_item,tuuta hua product bhej diya
+wrong_or_defective_item,saman kharab nikla packet me
+wrong_or_defective_item,screen toota hua hai bhai
+refund_request,I want my money back immediately for order #4012
+refund_request,"mera glass damaged aaya, enghana refund kittum?"
+refund_request,damaged item vannathil enghana refund kittum?
+refund_request,enghana refund kittum?
+refund_request,refund eppo kittum accountil?
+refund_request,paise wapas kardo refund chahiye
+refund_request,"Still waiting for refund, this is the 3rd time I am asking"
+refund_request,"Mera refund kab tak milega, 10 din ho gaye"
+refund_request,COD refund UPI pe abhi tak credit nahi hua
+refund_request,"Enikku refund venam, money accountil eppo credit aakum?"
+refund_request,Please process my refund of Rs 1499 right now
+refund_request,"Return pickup was completed 4 days ago, where is my refund?"
+refund_request,"Pickup done, still no refund credited to my bank account"
+refund_request,"Item wapas le gaye the delivery wale, paise kab aayenge?"
+refund_request,"Refund status says initiated, but bank has not received it"
+refund_request,UTR number for the refund transaction please
+refund_request,Refund transaction reference ID do
+refund_request,"Ente accountil cash vannilla, return eduthitt 5 days aayi"
+refund_request,I demand a full refund for this terrible experience
+refund_request,"Cancel kiya tha order, paise kab wapas aayenge?"
+refund_request,"Cancelled order #9921, refund not reflecting in credit card"
+refund_request,"Refund amount incorrect, deducted shipping charges without reason"
+refund_request,Paise kam refund kyu kiye? Full refund chahiye
+refund_request,Full amount refund aano kittuka?
+refund_request,How many days will it take for refund in SBI account?
+refund_request,"UPI refund usually takes 2 hours, why 3 days now?"
+refund_request,"GPay refund failure, please send to alternate UPI ID"
+refund_request,Refund bank account update kaise karu?
+refund_request,Bank details update cheyyan link tharumo refund nu vendi?
+refund_request,Refund ARN number please provide
+refund_request,"Need refund to original payment source, not wallet credits"
+refund_request,"Wallet me paise nahi chahiye, direct bank account me refund karo"
+refund_request,"Wallet balance aayi venda, bankil direct transfer aakkanam"
+refund_request,When will I get my refund for returned shoes #7712?
+refund_request,"Pickup executive approved refund, still waiting"
+refund_request,Refund delay complaint for order #30192
+refund_request,Kithra divasam edukkum refund aavan?
+refund_request,Can you transfer the refund directly to my Google Pay number?
+refund_request,Refund status update chahiye urgently
+refund_request,"Refund was rejected without reason, please re-initiate"
+refund_request,Refund reject kyu hua mera?
+refund_request,Why was my refund request closed automatically?
+refund_request,Account credit confirmation message nahi aaya abhi tak
+refund_request,Refund not received in debit card ending in 4019
+refund_request,Paise wapas kab transfer honge account me?
+refund_request,"Enikku cash refund venam, voucher venda"
+refund_request,"I don't want store credits, I want bank refund"
+refund_request,Refund process status check kardo please
+refund_request,Where is the refund for order cancellation #10923?
+refund_request,"It has been 7 business days, refund still pending"
+refund_request,Refund initiate aayathinte proof tharumo?
+refund_request,Please credit the pending refund amount of Rs 2350
+refund_request,Refund claim under buyer protection policy
+refund_request,Still awaiting refund confirmation email
+refund_request,Mera paisa wapas de do bhai jaldi
+refund_request,"Refund amount issue, Rs 500 missing from total"
+return_or_exchange,"I want to return this item, fitting is not proper"
+return_or_exchange,How to request an exchange for a larger size?
+return_or_exchange,"Mujhe ye dress return karna hai, return pickup arrange karo"
+return_or_exchange,App me return button nahi dikh raha hai
+return_or_exchange,Ith exchange aakkan pattuo? Size cheruthann
+return_or_exchange,Can I exchange this shirt for a size L instead of M?
+return_or_exchange,"Return window is closing tomorrow, please schedule pickup today"
+return_or_exchange,Return request create karna hai order #8812 ka
+return_or_exchange,Size exchange request for shoes order #6610
+return_or_exchange,"Fitting is too loose, want to exchange for smaller size"
+return_or_exchange,"Item pasand nahi aaya, wapas return karna hai"
+return_or_exchange,"Quality is not as expected, I want to return the product"
+return_or_exchange,"Return pickup reschedule karo please, I was not home"
+return_or_exchange,Pickup boy did not arrive for return collection today
+return_or_exchange,Return pickup aal vannilla innale
+return_or_exchange,How many days do I have to return this product?
+return_or_exchange,Is replacement available for this defective watch?
+return_or_exchange,Exchange options are not showing in the order details page
+return_or_exchange,Exchange option kaanikkunnilla appil
+return_or_exchange,Can I replace this with a different color?
+return_or_exchange,Black color ki jagah brown color exchange chahiye
+return_or_exchange,I want to generate return label for courier
+return_or_exchange,Return policy for electronics items kya hai?
+return_or_exchange,Return cheyyanulla procedure enthanu?
+return_or_exchange,Pickup agent refused to accept return saying barcode missing
+return_or_exchange,Delivery boy return lene se mana kar raha hai
+return_or_exchange,Please schedule return pickup between 2 PM to 5 PM
+return_or_exchange,Return address confirm kardo
+return_or_exchange,Can I return just 1 item from this bundle order?
+return_or_exchange,Combo me se ek item return ho sakta hai kya?
+return_or_exchange,Exchange piece kab deliver hoga?
+return_or_exchange,When will the replacement product be dispatched?
+return_or_exchange,Replacement order track karne ka link do
+return_or_exchange,Return request cancel karke exchange me convert karna hai
+return_or_exchange,Want to swap this item with another variant
+return_or_exchange,Ith maatti vere color edukkan pattumo?
+return_or_exchange,Can I return opened box cosmetic item?
+return_or_exchange,"Return request rejected showing non-returnable, please help"
+return_or_exchange,Non-returnable item dikha raha hai par product defective hai
+return_or_exchange,Product replacement complaint for order #90214
+return_or_exchange,How to track return pickup status?
+return_or_exchange,Return slip copy download kaise kare?
+return_or_exchange,Exchange order dispatch eppo aakum?
+return_or_exchange,Return pickup date change karni hai
+return_or_exchange,Courier person didn't give return receipt slip
+return_or_exchange,I want to send back this item for replacement
+return_or_exchange,"Pattilla fitting, exchange request raise cheyyu"
+return_or_exchange,Exchange size availability check karo
+return_or_exchange,Do I need original brand box for return?
+return_or_exchange,"Box fek diya tha, kya return accept hoga?"
+return_or_exchange,Please arrange exchange pickup for order #44901
+cancel_order,Please cancel my order #90211 immediately
+cancel_order,Stop dispatch and cancel my order right away
+cancel_order,"Galti se order ho gaya, please cancel kardo"
+cancel_order,Mera order cancel karke amount refund kardo
+cancel_order,"Ennte order cancel aakkanam, emergency aan"
+cancel_order,Cancel order #77123 before it leaves the warehouse
+cancel_order,"I ordered by mistake, cancel it please"
+cancel_order,"Accidental order placed by child, please cancel right now"
+cancel_order,Cancel button is disabled in the app for my order
+cancel_order,"App me cancel nahi ho raha order, please backend se cancel karo"
+cancel_order,"Appil cancel button work aavunnilla, cancel cheythu tharumo"
+cancel_order,"I no longer need this product, please cancel the shipment"
+cancel_order,"Found better price elsewhere, want to cancel this order"
+cancel_order,Cancel my order and confirm via SMS
+cancel_order,Cancellation confirmation email send karo
+cancel_order,Cancellation request for order #33190
+cancel_order,Cancel order and stop courier partner from delivery
+cancel_order,"Delivery reject kar dunga agar dispatch ho gaya to, cancel kardo abhi"
+cancel_order,"Order vendannu vechu, cancel cheyyanam"
+cancel_order,Is there any cancellation fee for cancelling order #5512?
+cancel_order,Cancel order before shipping charges apply
+cancel_order,Dispatch hone se pehle cancel kar do please
+cancel_order,Can you cancel only the second item in order #10293?
+cancel_order,Order cancel aakkiyal cash eppo kittum?
+cancel_order,How long to get refund after cancelling order?
+cancel_order,"Cancel order request submitted, please approve"
+cancel_order,Please abort shipment for order #99812
+cancel_order,Mera order cancel request pending kyu dikha raha hai?
+cancel_order,"Wrong delivery date promised, I want to cancel immediately"
+cancel_order,"Too much delivery delay, cancel this order now"
+cancel_order,"Ithra delay aayal venda, cancel cheyyu"
+cancel_order,Courier out for delivery hai par mujhe cancel karna hai
+cancel_order,Can I cancel order when out for delivery?
+cancel_order,Cancel kardo order urgently
+cancel_order,Cancel order #88192 immediately please
+cancel_order,"Delivery boy ko bolo order wapas le jaye, cancel hai"
+cancel_order,Cancel my booking for tomorrow's installation
+cancel_order,Cancellation OTP not received
+cancel_order,Cancel confirmation message eppo kittum?
+cancel_order,Why is cancellation not allowed for this order?
+cancel_order,Cancel policy check karni hai order #1928 ki
+cancel_order,Order cancel cheyyan pattunnilla enthanu reason?
+cancel_order,Cancel order and send amount to UPI
+cancel_order,"Please stop delivery of order #9012, cancel it"
+cancel_order,"Mistake in order quantity, please cancel so I can reorder"
+cancel_order,"Quantity galat daal di thi, cancel karo taaki naya order kar saku"
+cancel_order,I want to revoke this order immediately
+cancel_order,Cancel my pending order #66213
+cancel_order,Cancel cheyyanulla request accept aayo?
+cancel_order,Kindly cancel order #41203 without penalty
+cancel_subscription,Please stop auto-renewal for my pro membership
+cancel_subscription,Remove my credit card auto-pay for subscription
+cancel_subscription,"Next month se paise mat kaatna, subscription cancel chahiye"
+cancel_subscription,Auto renewal stop kaise kare account me?
+cancel_subscription,"Subscription stop aakkanam, next month debit aavalla"
+cancel_subscription,Cancel my annual membership subscription immediately
+cancel_subscription,I want to unsubscribe from premium plan
+cancel_subscription,Disable auto-debit on my HDFC card for your app
+cancel_subscription,Auto-debit mandate cancel karo bank se
+cancel_subscription,Subscription cancel cheythu tharumo?
+cancel_subscription,"I was charged for subscription renewal without notification, cancel and refund"
+cancel_subscription,Cancel recurring subscription for user id user_9981
+cancel_subscription,How to turn off auto renew in settings?
+cancel_subscription,Auto renew off karne ka option kahan hai?
+cancel_subscription,Auto renew option engne off aakkam?
+cancel_subscription,Cancel subscription and remove payment method
+cancel_subscription,I want to downgrade to free plan and stop paying
+cancel_subscription,Free tier me switch karo mera subscription
+cancel_subscription,Stop billing me every month for pro plan
+cancel_subscription,Monthly deduction stop karna hai
+cancel_subscription,Cancel my 1-year membership with immediate effect
+cancel_subscription,End my subscription cycle today
+cancel_subscription,Subscription renewal mandate revoke cheyyanam
+cancel_subscription,Can I cancel subscription and get prorated refund?
+cancel_subscription,Bache hue dino ka refund milega subscription cancel karne par?
+cancel_subscription,Cancel button not working on billing page
+cancel_subscription,Subscription cancel karne par data delete hoga kya?
+cancel_subscription,I do not wish to continue membership next month
+cancel_subscription,Agla mahina continue nahi karna hai subscription
+cancel_subscription,"Next month subscription venda, stop it"
+cancel_subscription,Revoke auto-pay UPI mandate for your service
+cancel_subscription,Paytm auto-pay cancel kaise kare aapki service ka?
+cancel_subscription,Google Play subscription cancel cheythittum paise poyi
+cancel_subscription,Cancel subscription confirmation receipt please
+cancel_subscription,Stop recurring charges on my account
+cancel_subscription,Subscription end date check karni hai cancel karne se pehle
+cancel_subscription,Cancel prime membership trial before deduction starts
+cancel_subscription,Free trial khatam hone se pehle cancel kardo auto-renewal
+cancel_subscription,Trial period kazhiyunnathinu munpe cancel aakkanam
+cancel_subscription,Opt out of automatic billing cycle
+cancel_subscription,Subscription plan cancellation request #8812
+cancel_subscription,Paise cut hona band karwao subscription ke
+cancel_subscription,Billing settingsil subscription cancel kaanikkunnilla
+cancel_subscription,Unsubscribe from monthly club membership
+cancel_subscription,Terminate premium plan subscription
+cancel_subscription,Auto renewal cancel hone ka SMS nahi aaya
+cancel_subscription,Is my subscription cancelled successfully?
+cancel_subscription,Subscription stop aayo ennu verify cheyyumo?
+cancel_subscription,Stop auto renewal for plan ID 402
+cancel_subscription,Remove auto debit mandate from UPI
+billing_dispute,Double payment charged for single order #4012
+billing_dispute,Unauthorized extra charge showing on my credit card statement
+billing_dispute,Ek hi order ke do baar paise kat gaye account se
+billing_dispute,Extra ₹299 kyu charge kiya hai bill me?
+billing_dispute,Ente bank accountil ninn rend thavana cash poyi
+billing_dispute,I was charged Rs 1500 but invoice shows Rs 1200
+billing_dispute,Why is there a mystery convenience fee added to my bill?
+billing_dispute,"Overcharged for order #88192, please correct invoice"
+billing_dispute,Two deductions on statement for same transaction
+billing_dispute,Bank statement shows duplicate payment to your merchant
+billing_dispute,Ek transaction ka do baar SMS aaya bank se
+billing_dispute,Double deduction complaint for order #3319
+billing_dispute,Extra delivery charge added even though order was above Rs 500
+billing_dispute,Free delivery bola tha fir ₹50 delivery fee kyu laga?
+billing_dispute,"Delivery charge extra charge cheythittund, refund venam"
+billing_dispute,Unknown deduction of Rs 499 from credit card with your name
+billing_dispute,Mera bina permission ke account se paise kyu kate?
+billing_dispute,Unauthorized auto debit charge dispute
+billing_dispute,GST calculation looks incorrect on bill #5512
+billing_dispute,Invoice amount does not match checkout screen total
+billing_dispute,"Checkout pe 800 dikhaya tha, account se 950 kat gaya"
+billing_dispute,Checkout screenil ullathalla bankil ninnum deduct aayathu
+billing_dispute,Charged twice while payment gateway was loading
+billing_dispute,Dispute transaction reference number TXN99812
+billing_dispute,"Bank says payment went to merchant twice, refund the duplicate amount"
+billing_dispute,Bank wale bol rahe hai merchant ke paas do baar payment gaya hai
+billing_dispute,"Rend thavana paisa poyittund, bank statement attach cheyyam"
+billing_dispute,I did not authorize this recurring fee
+billing_dispute,Disputed amount of Rs 350 on order #77124
+billing_dispute,Packaging fee charged without informing at checkout
+billing_dispute,Extra tax deduction dispute
+billing_dispute,Bill me discount coupon minus nahi kiya
+billing_dispute,Coupon applied successfully but full price debited from card
+billing_dispute,Discount subtract aakkilla final billil
+billing_dispute,Fraudulent charge of Rs 999 on my registered card
+billing_dispute,Card statement shows unexpected charges from your company
+billing_dispute,Paise zyada kat gaye offer price se
+billing_dispute,"Price shown was ₹1,499 but charged ₹1,799"
+billing_dispute,Billing error on receipt #00129
+billing_dispute,Billed for items that were out of stock and removed
+billing_dispute,Out of stock item ke bhi paise kaat liye bill me
+billing_dispute,Stock illatha itemntem cash debit cheythu
+billing_dispute,Raise billing dispute ticket with accounts team
+billing_dispute,Accounts team ko billing complaint bhejo
+billing_dispute,Dispute settlement timeline kya hai?
+billing_dispute,Bank chargeback initiate kar raha hu agar refund nahi mila to
+billing_dispute,Charged twice for same month subscription
+billing_dispute,Why was cancellation penalty charged on order cancelled within 5 mins?
+billing_dispute,Extra handling charge dispute for order #90124
+billing_dispute,"Wrong price charged on bill, please reverse extra amount"
+payment_failure,Amount debited from bank account but order not placed
+payment_failure,Payment got stuck on processing screen during checkout
+payment_failure,GPay se paise kat gaye par order confirm nahi hua
+payment_failure,UPI transaction failed bol raha hai par account se deduct ho gaya
+payment_failure,Payment aay pakshe order confirm aayilla
+payment_failure,Money debited from SBI account but app says transaction failed
+payment_failure,Payment failed error code ERR_PAYMENT_TIMEOUT
+payment_failure,"Checkout failed, money deducted from credit card"
+payment_failure,Paise kat gaye bank se par cart waisi ki waisi hi hai
+payment_failure,"Cart is still showing items, but Rs 2,400 deducted from my bank"
+payment_failure,Payment gateway error while paying through PhonePe
+payment_failure,PhonePe pe success dikha raha hai par aapki app me pending hai
+payment_failure,"GPay il successful aanu, appil payment failed"
+payment_failure,Will debited money be refunded if order was not created?
+payment_failure,Failed transaction refund turnaround time kya hai?
+payment_failure,"Bank says amount settled with merchant, but order not generated"
+payment_failure,Money deducted in failed netbanking transaction
+payment_failure,Net banking transaction timeout ho gaya paise katne ke baad
+payment_failure,Server error during payment submission
+payment_failure,Payment gateway crashed on OTP screen
+payment_failure,OTP daalne ke baad screen white ho gayi aur paise kat gaye
+payment_failure,"OTP enter cheythappol blank screen aayi, cash poyi"
+payment_failure,UPI transaction ID UPI992182910 payment status check please
+payment_failure,Can you verify if payment for cart #8812 was received by your system?
+payment_failure,Payment verification pending since 1 hour
+payment_failure,Payment pending status refresh nahi ho raha
+payment_failure,Pending payment auto-cancellation timeline
+payment_failure,Card declined message came but amount deducted from balance
+payment_failure,Balance cut ho gaya par card decline bataya
+payment_failure,Card debit aayi pakshe order id generate aayilla
+payment_failure,Duplicate payment attempt because first attempt showed failed
+payment_failure,"Pehle failed dikhaya to dobara pay kiya, dono baar paise kat gaye"
+payment_failure,Payment failed repeatedly with error 400
+payment_failure,Credit card payment not going through on checkout page
+payment_failure,Credit card se payment nahi ho raha baar baar fail ho raha hai
+payment_failure,Card accept aavunnilla payment pageil
+payment_failure,Payment failure dispute for transaction #TXN9921
+payment_failure,Where will the failed payment amount get credited back?
+payment_failure,Failed payment wapas aane me kitna time lagta hai?
+payment_failure,Failed transaction amount eppol bankil thirike kittum?
+payment_failure,UPI handle payment link expired before payment
+payment_failure,QR code payment failed at checkout
+payment_failure,QR code scan karke pay kiya paise kat gaye order nahi bana
+payment_failure,Paytm wallet balance deducted but booking failed
+payment_failure,Wallet debited but order creation failed
+payment_failure,"Bank UTR is 409182910283, please trace payment"
+payment_failure,Payment confirmation receipt send karo ya refund karo
+payment_failure,Transaction failed reason code check karke batao
+payment_failure,Payment stuck on verifying with bank
+payment_failure,Why does UPI payment fail continuously on your app?
+invoice_or_receipt,Need GST invoice for order #5512 for tax filing
+invoice_or_receipt,Send purchase receipt copy to my email address
+invoice_or_receipt,Order #5512 ki bill copy PDF me bhejo
+invoice_or_receipt,Invoice pe GSTIN number update kaise kare?
+invoice_or_receipt,Invoice copy kittuo? PDF formil venam
+invoice_or_receipt,Can I get a tax invoice with my company GST details?
+invoice_or_receipt,Download invoice button is giving 404 error
+invoice_or_receipt,Invoice download nahi ho raha order history me se
+invoice_or_receipt,Order history il ninn bill download aavunnilla
+invoice_or_receipt,Where to download purchase invoice for warranty claim?
+invoice_or_receipt,"Warranty ke liye bill copy chahiye, kahan se milegi?"
+invoice_or_receipt,Service center is asking for original tax invoice
+invoice_or_receipt,Email me the tax invoice for order #88910
+invoice_or_receipt,Order ka bill email ID pe send kar do please
+invoice_or_receipt,Registered emailil invoice send cheyyamo?
+invoice_or_receipt,Invoice is missing seller signature and GST break up
+invoice_or_receipt,GST breakup bill format me chahiye
+invoice_or_receipt,Need invoice for reimbursement from my employer
+invoice_or_receipt,Company reimbursement ke liye invoice generate kardo
+invoice_or_receipt,"Invoice me company name add karna bhul gaya tha, update ho sakta hai?"
+invoice_or_receipt,Can I revise the invoice to add GSTIN number?
+invoice_or_receipt,Billing address wrong on invoice #INV991
+invoice_or_receipt,Invoice me galat address print hua hai
+invoice_or_receipt,How to download past 1 year invoice statement?
+invoice_or_receipt,Saal bhar ke saare orders ka invoice statement chahiye
+invoice_or_receipt,Previous bills list engane download cheyyam?
+invoice_or_receipt,Invoice value is different from actual amount paid
+invoice_or_receipt,Receipt copy confirmation not received in inbox or spam
+invoice_or_receipt,Payment receipt PDF format me chahiye
+invoice_or_receipt,Original tax invoice parcel ke sath nahi aaya tha
+invoice_or_receipt,Physical invoice paper was not inside the delivery package
+invoice_or_receipt,Parcelil bill copy undayilla
+invoice_or_receipt,Can you send duplicate copy of cash memo for order #3319?
+invoice_or_receipt,Duplicate bill copy chahiye lost ho gayi
+invoice_or_receipt,"Bill copy lost aayi, duplicate tharumo?"
+invoice_or_receipt,"Invoice download link expired, please regenerate"
+invoice_or_receipt,Invoice date correction request
+invoice_or_receipt,Tax invoice with B2B GST compliance needed
+invoice_or_receipt,B2B invoice generate karne ka option kahan hai?
+invoice_or_receipt,Need invoice for electronic gadgets insurance claim
+invoice_or_receipt,Insurance claim nu vendi original bill copy venam
+invoice_or_receipt,Send order summary receipt via SMS or WhatsApp
+invoice_or_receipt,Order receipt WhatsApp pe bhej do
+invoice_or_receipt,Why is invoice showing Rs 0 for replacement item?
+invoice_or_receipt,Invoice number format verify kardo
+invoice_or_receipt,Can I get receipt for wallet recharge transaction?
+invoice_or_receipt,Wallet recharge ka bill chahiye
+invoice_or_receipt,Invoice download option app me kahan hai?
+invoice_or_receipt,Where can I find the invoice in desktop website?
+invoice_or_receipt,Tax invoice generated date mismatch on bill
+invoice_or_receipt,Ente purchase-inte GST bill copy engane download cheyyaam?
+invoice_or_receipt,GST bill copy engane download cheyyam?
+invoice_or_receipt,bill copy engane kittum?
+invoice_or_receipt,purchase bill download cheyyanam
+invoice_or_receipt,GST invoice engane edukkaam?
+invoice_or_receipt,bill copy download link tharumo?
+login_or_password_issue,OTP is not arriving on my registered mobile number
+login_or_password_issue,Password reset link sent to email is not working
+login_or_password_issue,"Login nahi ho raha, wrong password bataye ja raha hai"
+login_or_password_issue,Mobile pe OTP nahi aa raha reset karne ke liye
+login_or_password_issue,"App ill login aavunnilla, OTP varnnilla"
+login_or_password_issue,"Cannot log in to my account, showing account locked"
+login_or_password_issue,Account locked message showing after 3 wrong password attempts
+login_or_password_issue,Account block ho gaya hai login karte time
+login_or_password_issue,"Account lock aayi ennu kaanikkunnu, unlock cheyyu"
+login_or_password_issue,Forgot my password and recovery email is old
+login_or_password_issue,Password bhul gaya hu reset link bhejo phone pe
+login_or_password_issue,Password reset cheyyanulla link work aavunnilla
+login_or_password_issue,OTP timeout error continuously on Airtel network
+login_or_password_issue,Resend OTP button is disabled
+login_or_password_issue,OTP aane me 10 minute lag rahe hai tab tak expire ho jata hai
+login_or_password_issue,OTP expire aakunnathinu munpe receive aavunnilla
+login_or_password_issue,Google sign in button is throwing network error
+login_or_password_issue,Continue with Google click karne par blank screen aa rahi hai
+login_or_password_issue,Social login not working on iOS app
+login_or_password_issue,Two factor authentication SMS not received
+login_or_password_issue,2FA code nahi aa raha login karne ke liye
+login_or_password_issue,Two factor code phone il varnnilla
+login_or_password_issue,How to change my current login password?
+login_or_password_issue,Login password change karne ka option kahan hai?
+login_or_password_issue,Password engane change cheyyam profile settingsil?
+login_or_password_issue,Error: User not found with this mobile number
+login_or_password_issue,Number already registered dikha raha hai par login nahi ho raha
+login_or_password_issue,Session expired login again loop happening continuously
+login_or_password_issue,Bar bar session expired bol ke logout ho jata hai
+login_or_password_issue,App auto logout aavunnu repeatedly
+login_or_password_issue,Fingerprint biometric login failed in Android app
+login_or_password_issue,Face unlock login kaam nahi kar raha
+login_or_password_issue,Biometric login work aavunnilla
+login_or_password_issue,Cannot receive verification code while travelling abroad
+login_or_password_issue,International number pe OTP nahi aa raha
+login_or_password_issue,"Lost my registered phone, how to recover my account?"
+login_or_password_issue,Phone kho gaya hai account access kaise wapas lu?
+login_or_password_issue,"Phone lost aayi, account access engane kittum?"
+login_or_password_issue,Captcha image is not loading on login screen
+login_or_password_issue,Captcha code accept nahi ho raha bar bar wrong bol raha hai
+login_or_password_issue,Reset password link expired within 1 minute
+login_or_password_issue,Why is my account asking for verification again and again?
+login_or_password_issue,"Too many login attempts error, please wait 24 hours"
+login_or_password_issue,Too many attempts error clear kardo please
+login_or_password_issue,Account temporarily suspended login error
+login_or_password_issue,Login with email option is missing
+login_or_password_issue,Email se login karne ka option nahi dikh raha
+login_or_password_issue,"App says device not recognized, verify with OTP"
+login_or_password_issue,New device login verification issue
+login_or_password_issue,Help me sign in to my account #99812
+delete_account,Permanently close my account and erase all stored data
+delete_account,Remove my saved cards and delete profile history
+delete_account,Mera account permanently delete kar do please
+delete_account,Profile aur personal data remove karna hai account se
+delete_account,Ente account delete aakkanam
+delete_account,I want to permanently delete my account under GDPR rights
+delete_account,Please delete all my personal information from your servers
+delete_account,Mera sara data aur account delete chahiye
+delete_account,Delete my profile and unsubscribe from marketing emails
+delete_account,How to delete my account permanently from the mobile app?
+delete_account,App se account delete karne ka option kahan hai?
+delete_account,Account delete cheyyanulla option appil evide aanu?
+delete_account,Erase my purchase history and delete registered account
+delete_account,Order history aur card details remove karke account band karo
+delete_account,Saved address and payment cards delete kardo
+delete_account,Account delete request submit karni hai
+delete_account,Kindly process account deletion for registered email user@domain.com
+delete_account,Ente profile details completely wipe out cheyyanam
+delete_account,"I am closing this account, please confirm complete data wipeout"
+delete_account,Account close karne ka confirmation mail chahiye
+delete_account,Delete my phone number and email from database
+delete_account,Database se mera mobile number hata do
+delete_account,Close my profile and deactivate my login credentials
+delete_account,Deactivate nahi permanently delete karna hai
+delete_account,"Temporary deactivation venda, permanent deletion venam"
+delete_account,Delete account button is not responding in privacy settings
+delete_account,Privacy tab me delete button click nahi ho raha
+delete_account,How many days to complete data erasure after account deletion?
+delete_account,Account delete hone me kitna time lagta hai?
+delete_account,Delete request koduthal eppo complete aakum?
+delete_account,Remove my KYC documents and Aadhaar details from your system
+delete_account,Uploaded ID proof delete karo turant
+delete_account,KYC document serveril ninnum delete cheyyanam
+delete_account,Why is there no direct delete account option in iOS app?
+delete_account,Cannot find account deletion form
+delete_account,Please delete my account associated with +91-9876543210
+delete_account,Is account deletion reversible or permanent?
+delete_account,Account delete hone ke baad dubara open ho sakta hai kya?
+delete_account,Delete my wallet account and clear balance
+delete_account,Wallet band karke account delete kardo
+delete_account,Revoke all my account permissions and delete user record
+delete_account,User record delete karo please
+delete_account,Erase chat history and customer support tickets under my name
+delete_account,Support history delete karni hai
+delete_account,I want to erase my digital footprint from your platform
+delete_account,Delete account verification code send karo
+delete_account,Account deletion request confirmation #DEL9921
+delete_account,"Ente account ennum close aakkanam, never using again"
+delete_account,Terminate my account and clear all registered sessions
+delete_account,Permanently delete profile and payment methods
+update_account_details,Want to change my registered phone number
+update_account_details,How to update email address and name in profile settings?
+update_account_details,New mobile number update karna hai profile me
+update_account_details,Registered email ID badalna hai kaise kare?
+update_account_details,Profileil email address maattanam
+update_account_details,"I got a new phone number, how do I link it to my account?"
+update_account_details,"Purana number band ho gaya hai, naya number add karna hai"
+update_account_details,Phone number maatti puthiya number add cheyyanulla option undo?
+update_account_details,Update my primary delivery address in address book
+update_account_details,Default delivery address change kaise kare?
+update_account_details,Default address maattanam
+update_account_details,Correct the spelling of my name in account profile
+update_account_details,"Profile me mera naam galat spell hua hai, correct kardo"
+update_account_details,Name change request in profile settings
+update_account_details,How to update billing address for GST receipts?
+update_account_details,GST number profile me update karna hai
+update_account_details,Company GST details profileil engane add cheyyam?
+update_account_details,Link my new email address to my account
+update_account_details,Email verification email nahi aa raha email update karne ke baad
+update_account_details,Profile picture upload nahi ho rahi
+update_account_details,How to add alternate contact number in profile?
+update_account_details,Alternate phone number add karne ka option kahan hai?
+update_account_details,Alternate number engane add cheyyam?
+update_account_details,Update my date of birth in profile
+update_account_details,DOB update karni hai profile me
+update_account_details,Change my communication preferences in notification settings
+update_account_details,WhatsApp notification enable kaise kare profile me?
+update_account_details,WhatsApp updates on aakkanam
+update_account_details,Remove old expired debit card from saved payment methods
+update_account_details,Purana expired card delete karna hai saved cards me se
+update_account_details,Saved cardsil ninn pazhaya card delete aakkanam
+update_account_details,Update registered business address on corporate account
+update_account_details,Office address update karo profile me
+update_account_details,How to edit saved home address in app?
+update_account_details,Ghar ka address edit nahi ho raha app me
+update_account_details,Saved address edit cheyyan pattunnilla
+update_account_details,Can I merge two accounts registered with different emails?
+update_account_details,Do account ko merge kaise kare?
+update_account_details,Two accounts merge cheyyan pattumo?
+update_account_details,Change language preference from English to Hindi
+update_account_details,App ki language change kaise kare?
+update_account_details,Language setting engne maattam?
+update_account_details,Update bank account details for refund transfers
+update_account_details,Refund aane ke liye bank account update karna hai
+update_account_details,Bank details update cheyyan link tharumo?
+update_account_details,Profile update OTP was not received on new number
+update_account_details,Naye number pe OTP nahi aa raha verify karne ke liye
+update_account_details,Puthiya numberil OTP varnnilla
+update_account_details,"My profile details were edited without my knowledge, please check"
+update_account_details,Profile update confirmation email send karo
+technical_bug_report,App crashes continuously whenever I open checkout page
+technical_bug_report,Add to cart button is greyed out and not responding
+technical_bug_report,Checkout pe jate hi blank screen aa rahi hai app me
+technical_bug_report,Search bar kaam nahi kar raha Android app pe
+technical_bug_report,App open aakumpol crash aakunn
+technical_bug_report,Website gives 500 internal server error when clicking payment
+technical_bug_report,Cart page is freezing and not scrolling on iPhone
+technical_bug_report,App freeze ho rahi hai bar bar
+technical_bug_report,"Screen stuck aayi nilkkukayanu, touch work aavunnilla"
+technical_bug_report,"Product images are not loading, showing grey placeholder boxes"
+technical_bug_report,Photo load nahi ho rahi kisi bhi product ki
+technical_bug_report,Images onnum display aavunnilla appil
+technical_bug_report,Infinite loading spinner on track order page
+technical_bug_report,Loading circle ghumte hi rehta hai aage nahi badhta
+technical_bug_report,"Continuous loading spinner, nothing opens"
+technical_bug_report,Filter options are not working in product category search
+technical_bug_report,Price sort low to high filter results are broken
+technical_bug_report,Sort and filter option work aavunnilla
+technical_bug_report,Push notifications are not coming on Android 14
+technical_bug_report,App crashes immediately on startup after latest update
+technical_bug_report,Update ke baad app crash ho rahi hai open karte hi
+technical_bug_report,Latest update cheythathinu shesham open aavunnilla
+technical_bug_report,Discount code input field is missing on checkout page
+technical_bug_report,Coupon apply karne ka box hi gayab hai
+technical_bug_report,Coupon enter cheyyan ulla field kanmanilla
+technical_bug_report,Quantity counter jump from 1 to 10 automatically
+technical_bug_report,Pincode check serviceability widget giving network error
+technical_bug_report,Pincode verify nahi ho raha network error bol raha hai
+technical_bug_report,Pincode enter cheythal error message varunnu
+technical_bug_report,White blank screen bug on order summary screen
+technical_bug_report,Audio voice search not responding in mobile app
+technical_bug_report,Mic search kaam nahi kar raha mic icon tap karne par
+technical_bug_report,Location auto-detect permission error in app settings
+technical_bug_report,GPS location detect nahi ho rahi delivery address ke liye
+technical_bug_report,Location fetch aavunnilla mapil
+technical_bug_report,"Cannot click place order button, button is disabled"
+technical_bug_report,Order place button clickable nahi hai
+technical_bug_report,Place order button tap cheythal onnum sambhavikkunnilla
+technical_bug_report,"App memory consumption is very high, heating my phone"
+technical_bug_report,Battery drain issue with background app service
+technical_bug_report,Session timeout error code SEC_401 on every tab switch
+technical_bug_report,Error popup says something went wrong please try again later
+technical_bug_report,Something went wrong error bar bar aa raha hai
+technical_bug_report,Something went wrong ennu paranj popup varunnu
+technical_bug_report,Wishlist item count not syncing between phone and laptop
+technical_bug_report,Website layout is completely broken on iPad Safari browser
+technical_bug_report,Dark mode toggle makes text invisible black on black
+technical_bug_report,"Video review is not playing, shows decoding error"
+technical_bug_report,Review video play aavunnilla
+technical_bug_report,Bug report ticket raise kardo technical team ko
+how_to_question,How to apply coupon code at checkout?
+how_to_question,Where is the option to track live delivery executive?
+how_to_question,Coupon code kaise redeem kare payment screen par?
+how_to_question,Multiple delivery addresses kaise save karu app me?
+how_to_question,Coupons engane aanu redeem cheyyandhe?
+how_to_question,How do I use my wallet credits during purchase?
+how_to_question,Wallet balance use kaise kare shopping karte time?
+how_to_question,Wallet points engane use cheyyam paymentil?
+how_to_question,Where can I find my referral code to share with friends?
+how_to_question,Referral link kahan milega app me?
+how_to_question,Referral code evide aanu kaanuka?
+how_to_question,How to schedule delivery for a specific time slot?
+how_to_question,Specific time pe delivery kaise select kare?
+how_to_question,Delivery time slot engane choose cheyyam?
+how_to_question,How do I add multiple items from different sellers in one cart?
+how_to_question,How to change default payment mode to UPI?
+how_to_question,Default payment UPI kaise set kare?
+how_to_question,How to view my complete past order history?
+how_to_question,Purane orders ki list kahan dekhe app me?
+how_to_question,Pazhaya orders evide check cheyyam?
+how_to_question,How does the return pickup process work?
+how_to_question,Return pickup me delivery boy kya check karta hai?
+how_to_question,Return cheyyumpol box seal cheyyanamo?
+how_to_question,How to track the live location of the delivery boy?
+how_to_question,Delivery executive ka phone number kahan dikhta hai?
+how_to_question,How to leave a review and photo for a purchased item?
+how_to_question,Product review kaise likhe aur photo kaise dale?
+how_to_question,Review and rating engane add cheyyam?
+how_to_question,How to enable push notifications for price drop alerts?
+how_to_question,Price drop alert kaise set kare kisi product par?
+how_to_question,Price drop alert engane set aakkam?
+how_to_question,How to redeem gift card voucher in payment options?
+how_to_question,Gift card code kahan enter karna hota hai?
+how_to_question,Gift voucher engane apply cheyyam?
+how_to_question,How to request duplicate invoice for warranty?
+how_to_question,How do I contact customer support via live chat?
+how_to_question,Live chat agent se baat kaise shuru kare?
+how_to_question,Customer support chat evide aanu?
+how_to_question,How to cancel auto-renewal in membership settings?
+how_to_question,How to save credit card safely for faster checkout?
+how_to_question,Card save kaise kare checkout ke liye?
+how_to_question,How to check if delivery is available at my pincode?
+how_to_question,Pincode delivery check karne ka tarika kya hai?
+how_to_question,Ente pincodil delivery undonn engane ariyaam?
+how_to_question,How to delete a saved delivery address?
+how_to_question,Saved address remove kaise kare?
+how_to_question,How does the size exchange process work?
+how_to_question,Exchange process me naya item kab aata hai?
+how_to_question,How to transfer wallet balance back to bank account?
+how_to_question,Wallet se bank me paise wapas kaise transfer kare?
+how_to_question,how to book stuff?
+how_to_question,how to book an order on app?
+how_to_question,how to buy items here?
+how_to_question,booking kaise kare app se?
+how_to_question,how to place a new order?
+how_to_question,order engane place cheyyam?
+pricing_or_plan_question,What is the annual pro membership pricing?
+pricing_or_plan_question,Is there any student discount available on plans?
+pricing_or_plan_question,Pro plan ka monthly kitna charge lagega?
+pricing_or_plan_question,Prime membership me delivery free hai kya?
+pricing_or_plan_question,Ethrayan monthly plan price?
+pricing_or_plan_question,What are the benefits included in the VIP subscription tier?
+pricing_or_plan_question,VIP plan me kya kya benefits milte hai?
+pricing_or_plan_question,VIP membershipil enthellam benefits undu?
+pricing_or_plan_question,How much does fast express delivery cost per order?
+pricing_or_plan_question,Express delivery ka kitna extra charge lagta hai?
+pricing_or_plan_question,Express delivery charge ethrayanu?
+pricing_or_plan_question,Is there any cashback offer on HDFC credit cards today?
+pricing_or_plan_question,Bank offer discounts list kahan dekh sakte hai?
+pricing_or_plan_question,Credit card offer details evide check cheyyam?
+pricing_or_plan_question,What is the price difference between monthly and yearly plans?
+pricing_or_plan_question,Yearly plan lene pe kitna discount milta hai?
+pricing_or_plan_question,Yearly plan eduthal discount kittumo?
+pricing_or_plan_question,Does the subscription plan include free returns on all orders?
+pricing_or_plan_question,Free return membership plan ka part hai kya?
+pricing_or_plan_question,Are there any hidden charges or platform fees?
+pricing_or_plan_question,Platform fee kyu lagti hai har order pe?
+pricing_or_plan_question,Extra platform charge undo billil?
+pricing_or_plan_question,Is there a free trial period for the premium plan?
+pricing_or_plan_question,Free trial kitne din ka milta hai subscription ka?
+pricing_or_plan_question,Free trial period undo premium plan nu?
+pricing_or_plan_question,Do you offer corporate or bulk purchase discounts?
+pricing_or_plan_question,Bulk order pe special pricing milega kya?
+pricing_or_plan_question,Bulk order discount rate ethrayanu?
+pricing_or_plan_question,What is the minimum order value for free delivery?
+pricing_or_plan_question,Free delivery ke liye minimum kitne ka order karna padega?
+pricing_or_plan_question,Free delivery kittan minimum ethra amount order cheyyanam?
+pricing_or_plan_question,How much does premium membership cost after discount?
+pricing_or_plan_question,First order discount coupon code kya hai?
+pricing_or_plan_question,New user discount offer kitna percentage hai?
+pricing_or_plan_question,First order offer undo puthiya users nu?
+pricing_or_plan_question,Why did the subscription price increase this month?
+pricing_or_plan_question,Monthly fee badha kyu di bina bataye?
+pricing_or_plan_question,Plan charges koodiyo ee month?
+pricing_or_plan_question,What is the renewal cost for second year membership?
+pricing_or_plan_question,Renewal charges kitne honge agle saal?
+pricing_or_plan_question,Is GST included in the displayed product price or added at checkout?
+pricing_or_plan_question,Price me tax included hai ya extra lagega?
+pricing_or_plan_question,Tax amount priceil include cheythittundo?
+pricing_or_plan_question,Can I upgrade from monthly plan to annual plan mid-cycle?
+pricing_or_plan_question,Monthly se yearly plan me upgrade kaise kare?
+pricing_or_plan_question,Plan upgrade cheyyanulla rate ethrayanu?
+pricing_or_plan_question,What are the charges for Cash on Delivery (COD) orders?
+pricing_or_plan_question,COD order pe extra kitna paisa lagta hai?
+pricing_or_plan_question,Cash on delivery charge extra undo?
+pricing_or_plan_question,Pricing tier comparison table kahan milega?
+feature_request_or_feedback,Please add dark mode option in the mobile app
+feature_request_or_feedback,Great service! Really impressed with fast delivery
+feature_request_or_feedback,"App mast hai, bass wishlist feature bhi add kardo"
+feature_request_or_feedback,Sodexo card payment support shuru karo app me
+feature_request_or_feedback,"Nalla app aan, pakshe wishlist feature koode venam"
+feature_request_or_feedback,Would love to see scheduled delivery slots for weekends
+feature_request_or_feedback,Weekend delivery slot ka option hona chahiye app me
+feature_request_or_feedback,Can you introduce Apple Pay payment method?
+feature_request_or_feedback,Apple Pay support add karo checkout pe
+feature_request_or_feedback,Apple Pay integration venamayirunnu
+feature_request_or_feedback,"Loved the packaging quality, very safe and eco-friendly"
+feature_request_or_feedback,Packaging bohot achi thi thanks for using paper bags
+feature_request_or_feedback,"Super packaging, eco-friendly aayathu nannayi"
+feature_request_or_feedback,Feature request: Please allow sharing cart link with family members
+feature_request_or_feedback,Family cart share karne ka feature banao
+feature_request_or_feedback,Shared cart feature add cheyyamo?
+feature_request_or_feedback,"App UI looks very clean and modern after the update, good job"
+feature_request_or_feedback,Naya UI update bohot sundar lag raha hai
+feature_request_or_feedback,"Puthiya app design nannayittund, very fast"
+feature_request_or_feedback,Please bring back the price alert notification feature
+feature_request_or_feedback,Purana price alert feature wapas lao please
+feature_request_or_feedback,Add Malayalam language option in app localization
+feature_request_or_feedback,Hindi and regional languages support chahiye app me
+feature_request_or_feedback,Regional language support kooduthal add cheyyu
+feature_request_or_feedback,It would be great to have voice search in regional accents
+feature_request_or_feedback,Voice search improve karo Indian accents ke liye
+feature_request_or_feedback,Search bar should suggest previous searched queries
+feature_request_or_feedback,Suggestion: Give option to tip delivery executive inside app
+feature_request_or_feedback,Delivery boy ko tip dene ka option add karo app me
+feature_request_or_feedback,Delivery person nu tip kodukkanulla feature add cheyyo
+feature_request_or_feedback,Feedback: Delivery executive was very polite and helpful
+feature_request_or_feedback,"Delivery boy ka behavior bohot acha tha, 5 star rating"
+feature_request_or_feedback,Delivery person nalla reethiyilaanu behave cheythathu
+feature_request_or_feedback,Please enable biometric fingerprint login for quick access
+feature_request_or_feedback,Fingerprint se app unlock karne ka option do
+feature_request_or_feedback,Fingerprint login feature add cheythal nannayirunnu
+feature_request_or_feedback,Would love to have an instant re-order button on homepage
+feature_request_or_feedback,Repeat order ke liye one-click button banao
+feature_request_or_feedback,Suggestion regarding returns: Instant pickup option would be great
+feature_request_or_feedback,Paperless digital invoice by default is a great eco step
+feature_request_or_feedback,Option to decline plastic cutlery should be enabled
+feature_request_or_feedback,Cutlery opt-out option do food orders me
+feature_request_or_feedback,"Love the fast refund turnaround time, best shopping app"
+feature_request_or_feedback,"Refund speed bohot fast hai, keep it up team"
+feature_request_or_feedback,"Customer support speed valare fast aanu, thanks"
+feature_request_or_feedback,Feature request: Price history graph on product page
+feature_request_or_feedback,Product page pe price comparison chart hona chahiye
+feature_request_or_feedback,Price tracking graph feature introduce cheyyamo?
+feature_request_or_feedback,"Great discounts during festive sale, satisfied customer"
+feature_request_or_feedback,"Festive sale offers mast the, thank you"
+complaint_or_escalate_to_human,Useless bot! Connect me to a real agent right now
+complaint_or_escalate_to_human,"Worst customer support experience, 5 times I called today"
+complaint_or_escalate_to_human,Kisi human executive se baat karwao abhii
+complaint_or_escalate_to_human,"Manager se connect karo, bohot bakwas response hai"
+complaint_or_escalate_to_human,Customer care executiveinna ellel ninthe manager inna connect chey
+complaint_or_escalate_to_human,"Stop giving automated robot answers, I want to speak to a person"
+complaint_or_escalate_to_human,"Robot wale jawab mat do, human agent se baat karni hai"
+complaint_or_escalate_to_human,"Bot answers mathi, oru real aalode samsarikkanam"
+complaint_or_escalate_to_human,"I am extremely angry, connect me to your senior manager immediately"
+complaint_or_escalate_to_human,Manager level escalation request for complaint ticket #99120
+complaint_or_escalate_to_human,Senior supervisor ko call transfer karo abhi ke abhi
+complaint_or_escalate_to_human,"Manager level escalation venam, this is unacceptable"
+complaint_or_escalate_to_human,"Your customer service is completely useless, no one helps"
+complaint_or_escalate_to_human,"Bohot ghatiya service hai, koi problem solve nahi karta"
+complaint_or_escalate_to_human,"Valare mosham service, aarkkum oru karyavum cheyyan ariyilla"
+complaint_or_escalate_to_human,I have been waiting on chat for 45 minutes without response
+complaint_or_escalate_to_human,45 minute se wait kar raha hu koi reply nahi deta
+complaint_or_escalate_to_human,"45 minutes aayi wait cheyyunnu, ithano customer service?"
+complaint_or_escalate_to_human,I am going to file a complaint in consumer forum
+complaint_or_escalate_to_human,Consumer court me complaint file karunga tumhari company ke khilaf
+complaint_or_escalate_to_human,Consumer courtil complaint kodukkum njan
+complaint_or_escalate_to_human,Connect me to customer care helpline number immediately
+complaint_or_escalate_to_human,Helpline number do customer support ka call karne ke liye
+complaint_or_escalate_to_human,Direct call cheyyan toll-free number tharumo?
+complaint_or_escalate_to_human,"Third time I am reaching out for same issue, zero resolution"
+complaint_or_escalate_to_human,Teeno baar complaint band kar di bina solve kiye
+complaint_or_escalate_to_human,"Oru resolution um tharunnilla, fake promises only"
+complaint_or_escalate_to_human,I demand an immediate callback from a human supervisor
+complaint_or_escalate_to_human,Supervisor se callback arrange karo 15 minute me
+complaint_or_escalate_to_human,Supervisor callback arrange cheyyu urgently
+complaint_or_escalate_to_human,This chatbot keeps repeating the same scripted lines
+complaint_or_escalate_to_human,Script padhna band karo aur dhang se baat karo
+complaint_or_escalate_to_human,"Repeated standard messages mathi, solve my issue"
+complaint_or_escalate_to_human,"Total waste of my time, transfer this chat right now"
+complaint_or_escalate_to_human,Time waste mat karo manager ko bulao
+complaint_or_escalate_to_human,I will tag your founders on Twitter / LinkedIn with screenshots
+complaint_or_escalate_to_human,Social media pe post karunga sara screenshot leke
+complaint_or_escalate_to_human,Twitter il viral aakkum ee fraud service
+complaint_or_escalate_to_human,You charged my money and deliver broken products and now ignore me
+complaint_or_escalate_to_human,"Fraud company, paise le liye aur help nahi kar rahe"
+complaint_or_escalate_to_human,I want written apology and compensation for harassment
+complaint_or_escalate_to_human,Mental harassment ka compensation chahiye
+complaint_or_escalate_to_human,Transfer me to customer retention department
+complaint_or_escalate_to_human,Escalate ticket #77812 to level 2 support team
+complaint_or_escalate_to_human,Level 2 technical support team se baat karwao
+complaint_or_escalate_to_human,Support team level 2 escalation request
+complaint_or_escalate_to_human,Are you a machine or human? Get me a real person!
+complaint_or_escalate_to_human,Real insaan se connect karo please
+complaint_or_escalate_to_human,Human representative unavailable aano? Connect urgently!
+complaint_or_escalate_to_human,"Worst support ever, transferring complaint to legal team"
+general_chitchat_or_faq,Hi good morning team
+general_chitchat_or_faq,What are your store operating hours today?
+general_chitchat_or_faq,"Hello sir, aapka store kab tak khula rehta hai?"
+general_chitchat_or_faq,Thank you so much help ke liye
+general_chitchat_or_faq,Shops eppo thorakkum?
+general_chitchat_or_faq,"Good evening, is customer support active right now?"
+general_chitchat_or_faq,"Namaste, support timing kya hai aapka?"
+general_chitchat_or_faq,"Namaskaram, ivide ippo aalundo help cheyyan?"
+general_chitchat_or_faq,"Hello, are you an AI assistant?"
+general_chitchat_or_faq,Aap chatbot ho ya insaan?
+general_chitchat_or_faq,Thanikku Malayalam ariyumo?
+general_chitchat_or_faq,Do you provide delivery on Sundays and public holidays?
+general_chitchat_or_faq,Sunday ko delivery hoti hai kya?
+general_chitchat_or_faq,Sunday delivery available aano?
+general_chitchat_or_faq,Where is your corporate head office located?
+general_chitchat_or_faq,Company ka head office kahan pe hai?
+general_chitchat_or_faq,Office location evide aanu?
+general_chitchat_or_faq,Thank you for resolving my query quickly!
+general_chitchat_or_faq,Shukriya bohot bohot aapki help ke liye
+general_chitchat_or_faq,"Thank you so much for the assistance, have a good day"
+general_chitchat_or_faq,Have a great day ahead team!
+general_chitchat_or_faq,Aapka din shubh ho!
+general_chitchat_or_faq,Nalla oru divasam aashamsikkunnu
+general_chitchat_or_faq,What are your customer support working hours?
+general_chitchat_or_faq,Customer support kitne baje se kitne baje tak open rehta hai?
+general_chitchat_or_faq,Support timings eppol muthal eppol vare aanu?
+general_chitchat_or_faq,Do you deliver all across India?
+general_chitchat_or_faq,All India delivery available hai kya?
+general_chitchat_or_faq,All India delivery undo?
+general_chitchat_or_faq,"Hi there, just wanted to check if you are online"
+general_chitchat_or_faq,Koi online hai kya chat pe?
+general_chitchat_or_faq,Online aano ippo?
+general_chitchat_or_faq,How can you help me today?
+general_chitchat_or_faq,Aap meri kya madad kar sakte ho?
+general_chitchat_or_faq,Enthokke karyangalil aanu help cheyyuka?
+general_chitchat_or_faq,Good afternoon support team
+general_chitchat_or_faq,"Hi, testing the chat function"
+general_chitchat_or_faq,Bas check kar raha tha chat chal rahi hai ya nahi
+general_chitchat_or_faq,Chat working aano ennu check cheythatha
+general_chitchat_or_faq,Thanks a lot for the quick response
+general_chitchat_or_faq,Bahut jaldi solve kar diya thanks
+general_chitchat_or_faq,"Valare nanni, quick resolution"
+general_chitchat_or_faq,"Bye, take care"
+general_chitchat_or_faq,"Alvida, take care"
+general_chitchat_or_faq,Sheri pinne kaanaam
+general_chitchat_or_faq,Happy Diwali to the customer support team
+general_chitchat_or_faq,Happy Onam support team!
+general_chitchat_or_faq,Festive greetings to everyone
+general_chitchat_or_faq,"Okay understood, thank you"
+general_chitchat_or_faq,"Theek hai samajh gaya, dhanyawad"
+other_unclear,ok thanks
+other_unclear,plz help fast
+other_unclear,kuch bhi
+other_unclear,kya hua bhai
+other_unclear,Enthau bro
+other_unclear,eh?
+other_unclear,what is this shit
+other_unclear,asdfghjk
+other_unclear,???
+other_unclear,.....
+other_unclear,hello???
+other_unclear,bhai suno
+other_unclear,hey
+other_unclear,yo
+other_unclear,dude
+other_unclear,machane
+other_unclear,pls check
+other_unclear,fast
+other_unclear,urgently needed
+other_unclear,why
+other_unclear,kya re
+other_unclear,entha ith
+other_unclear,ayyo
+other_unclear,argh
+other_unclear,hmm
+other_unclear,ok
+other_unclear,okk
+other_unclear,kk
+other_unclear,sheri
+other_unclear,theek hai
+other_unclear,nahi hua
+other_unclear,wait
+other_unclear,one sec
+other_unclear,oru second
+other_unclear,test message
+other_unclear,12345
+other_unclear,nothing
+other_unclear,forget it
+other_unclear,chodo
+other_unclear,venda
+other_unclear,see this
+other_unclear,dekho
+other_unclear,nokk
+other_unclear,what happened
+other_unclear,kya scene hai
+other_unclear,entharu
+other_unclear,lol
+other_unclear,haha
+other_unclear,nonsense
+other_unclear,leave it
+other_unclear,nvm
+other_unclear,call me
+shipping_address_change,Need to update delivery address for order #8801
+shipping_address_change,"I entered wrong address by mistake, change to my home address"
+shipping_address_change,Dispatch se pehle delivery location badal do please
+shipping_address_change,Order #8801 ka shipping address update kardo
+shipping_address_change,"Delivery location maattanam, order already placed"
+shipping_address_change,Can I change the delivery address for an order that is already placed?
+shipping_address_change,"I put office address instead of home, please change it"
+shipping_address_change,"Ghar ka address daalna tha galti se office ka daal diya, badal do"
+shipping_address_change,Home address maatti office address aakkanam orderil
+shipping_address_change,"Update shipping address to Flat 402, Green Valley Apartments"
+shipping_address_change,Please change destination pincode to 560034 for parcel #9910
+shipping_address_change,"Pincode galat daal diya tha order me, correct kardo please"
+shipping_address_change,"Pincode mistake aayi poyi, change cheyyanam"
+shipping_address_change,Delivery address modification request for order #33190
+shipping_address_change,Address change button nahi dikh raha order details me
+shipping_address_change,Appil shipping address change option kanmanilla
+shipping_address_change,Can the delivery boy deliver to my neighbour's house?
+shipping_address_change,Padosi ke ghar pe deliver karne bol do delivery boy ko
+shipping_address_change,Next door houseil delivery kodukkan pattumo?
+shipping_address_change,Please update delivery landmark to Near Apollo Hospital
+shipping_address_change,Landmark add karna tha address me
+shipping_address_change,Landmark details add cheyyanulla option undo?
+shipping_address_change,Wrong house number mentioned in shipping details
+shipping_address_change,"House number 12 nahi 21 hai, edit kardo please"
+shipping_address_change,"House number mistake aayi, edit cheyyumo?"
+shipping_address_change,Change shipping address before product is dispatched from seller
+shipping_address_change,"Seller ne dispatch nahi kiya abhi tak, address change kar do"
+shipping_address_change,Dispatch aavunnathinu munpe address maattam ennu paranjallo
+shipping_address_change,"Delivery city changed from Pune to Mumbai, update parcel destination"
+shipping_address_change,City change karni hai delivery address me
+shipping_address_change,City change aakkan pattumo shipment nu?
+shipping_address_change,Please re-route shipment #77812 to my alternate address
+shipping_address_change,Parcel ko dusre address pe divert kar do please
+shipping_address_change,Parcel vere addressilekku redirect cheyyumo?
+shipping_address_change,Update recipient phone number for delivery coordination
+shipping_address_change,Delivery contact number update karna hai taaki delivery boy call kar sake
+shipping_address_change,Delivery boy vilikkanulla phone number maattanam
+shipping_address_change,Can I change delivery address after shipment is out for delivery?
+shipping_address_change,Out for delivery hone ke baad address change ho sakta hai kya?
+shipping_address_change,Out for delivery aayathinu shesham location maattamundo?
+shipping_address_change,Urgent shipping address correction for order #66219
+shipping_address_change,Address me floor number aur flat number add karna hai
+shipping_address_change,Floor details miss aayi poyi addressil
+shipping_address_change,Change delivery address confirmation SMS please send
+shipping_address_change,Address update ho gaya kya confirm karo
+shipping_address_change,Address maatiyathinte confirmation message vannilla
+shipping_address_change,Change recipient name on delivery package to Adhish
+shipping_address_change,Package pe recipient ka naam change kardo
+shipping_address_change,Parcel receive cheyyunna aalude name maattanam
+shipping_address_change,Please divert package #5512 to my current live location

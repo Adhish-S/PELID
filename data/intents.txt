@@ -1,0 +1,98 @@
+# Pelid — Routing Intents (Customer Support Domain)
+# Each intent = one category Laya will classify incoming decisions into.
+# Intents marked [DESTRUCTIVE] ALWAYS route to Path B (frontier LLM),
+# regardless of Laya's confidence score.
+
+# ─────────────────────────────────────────────────────────────
+# ORDER & DELIVERY
+# ─────────────────────────────────────────────────────────────
+
+1. order_status
+   → Where is my order, tracking updates, ETA inquiries
+
+2. order_delayed_or_missing
+   → Late delivery, never arrived, marked delivered but not received
+
+3. wrong_or_defective_item
+   → Wrong product sent, damaged on arrival, not working
+
+# ─────────────────────────────────────────────────────────────
+# MONEY & TRANSACTIONS  [most are destructive/financial]
+# ─────────────────────────────────────────────────────────────
+
+4. refund_request  [DESTRUCTIVE]
+   → Wants money back, including COD refunds and refund-status chasing
+
+5. return_or_exchange
+   → Wants to send an item back or swap it for another
+
+6. cancel_order  [DESTRUCTIVE]
+   → Cancel an order before or after dispatch
+
+7. cancel_subscription  [DESTRUCTIVE]
+   → Stop a recurring plan or auto-renewal
+
+8. billing_dispute  [DESTRUCTIVE]
+   → Duplicate charge, wrong amount, unexpected charge, chargeback-related
+
+9. payment_failure
+   → UPI / card / netbanking failed, money debited but order not placed
+
+10. invoice_or_receipt
+    → GST invoice request, receipt copy, tax documentation
+
+# ─────────────────────────────────────────────────────────────
+# ACCOUNT MANAGEMENT
+# ─────────────────────────────────────────────────────────────
+
+11. login_or_password_issue
+    → Can't sign in, password reset, OTP not arriving
+
+12. delete_account  [DESTRUCTIVE]
+    → Close the account, erase data, GDPR-style deletion
+
+13. update_account_details
+    → Change address, phone number, email, name on account
+
+# ─────────────────────────────────────────────────────────────
+# PRODUCT & TECHNICAL
+# ─────────────────────────────────────────────────────────────
+
+14. technical_bug_report
+    → App or website crashing, errors, broken feature, glitches
+
+15. how_to_question
+    → "How do I do X in the product?", feature usage help
+
+16. pricing_or_plan_question
+    → Plans, prices, what's included, upgrade/downgrade options
+
+# ─────────────────────────────────────────────────────────────
+# HUMAN INTERACTION & CATCH-ALL
+# ─────────────────────────────────────────────────────────────
+
+17. feature_request_or_feedback
+    → Suggestions, praise, non-urgent opinions about the product
+
+18. complaint_or_escalate_to_human
+    → Angry customer, repeated contact, asks for a manager or human agent
+
+19. general_chitchat_or_faq
+    → Greetings, thanks, store hours, basic FAQs (strong Path A candidate)
+
+20. other_unclear
+    → Anything that doesn't fit, or too vague to classify → Path B
+
+21. shipping_address_change  [DESTRUCTIVE]
+    → Change delivery address on a live order (irreversible once dispatched)
+
+
+# ─────────────────────────────────────────────────────────────
+# SUMMARY
+# ─────────────────────────────────────────────────────────────
+# Total intents:      21
+# Destructive (★):    6 (refund_request, cancel_order, cancel_subscription,
+#                        billing_dispute, delete_account, shipping_address_change)
+# Strong Path A:      general_chitchat_or_faq, how_to_question,
+#                     order_status, invoice_or_receipt
+# Always Path B:      other_unclear + all [DESTRUCTIVE]

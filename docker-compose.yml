@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  pelid-gateway:
+    build: .
+    container_name: pelid-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - UPSTREAM_BASE_URL=${UPSTREAM_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
+      - UPSTREAM_MODEL=${UPSTREAM_MODEL:-gemini-3.5-flash-lite}
+      - CONFIDENCE_THRESHOLD=0.70
+      - CONTEXT_BUDGET_TOKENS=450
+      - ENABLE_INJECTION_SHIELD=true
+      - PELID_PROXY_API_KEY=${PELID_PROXY_API_KEY:-}
+      - SHADOW_MODE=${SHADOW_MODE:-false}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
