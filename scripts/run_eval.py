@@ -38,7 +38,7 @@ from pelid.lang_router import detect_language
 from pelid.domain import get_domain_destructive_intents
 from pelid.context_budget import count_tokens
 
-SEED_FILE = PROJECT_ROOT / "data" / "seed_examples.txt"
+SEED_FILE = PROJECT_ROOT / "data" / "unseen_test_set.txt"
 REPORT_MD_FILE = PROJECT_ROOT / "EVALUATION_REPORT.md"
 REPORT_JSON_FILE = PROJECT_ROOT / "evaluation_results.json"
 
