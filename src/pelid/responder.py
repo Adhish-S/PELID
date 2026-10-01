@@ -210,19 +210,63 @@ async def resolve_path_a_response(
 ) -> str:
     """
     Entry point for generating the final assistant message for Path A.
-    Dispatches to template/CRM, free cloud upstream, or local SLM based on configuration.
+    Dispatches to:
+    1. 'template' (Default): Zero-latency, zero-hallucination deterministic CRM lookup (<1ms, $0.00).
+    2. 'slm': On-device / local small language model (e.g. Ollama / llama.cpp / vLLM Qwen2.5-0.5B).
+    3. 'free_gemini': Grounded micro-LLM via Google Gemini API with local intent gating.
     """
     if RESPONDER_MODE == "template":
         return generate_crm_response(query, intent, language)
+
+    elif RESPONDER_MODE == "slm":
+        import httpx
+
+        slm_url = os.getenv("PELID_SLM_URL", "http://127.0.0.1:11434/v1/chat/completions")
+        slm_model = os.getenv("PELID_SLM_MODEL", "qwen2.5:0.5b")
+        lang_prompt = {
+            "ml": "Malayalam (Romanized / Manglish)",
+            "hi": "Hindi (Romanized / Hinglish)",
+            "en": "English",
+        }.get(language, "English")
+
+        prompt = (
+            f"You are a helpful customer support assistant. The customer's intent is verified as: '{intent}'.\n"
+            f"Customer query: \"{query}\"\n"
+            f"Write a friendly, accurate 1-sentence reply in {lang_prompt}. Do not hallucinate order numbers."
+        )
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                res = await client.post(
+                    slm_url,
+                    json={
+                        "model": slm_model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 80,
+                        "temperature": 0.3,
+                    },
+                )
+                if res.status_code == 200:
+                    data = res.json()
+                    if "choices" in data and data["choices"]:
+                        return data["choices"][0]["message"]["content"].strip()
+        except Exception:
+            # If local SLM daemon is not running, gracefully fallback to deterministic CRM template
+            pass
 
     elif RESPONDER_MODE == "free_gemini":
         from pelid.config import GEMINI_API_KEY, UPSTREAM_BASE_URL, UPSTREAM_MODEL
         import httpx
 
+        lang_prompt = {
+            "ml": "Malayalam (Romanized / Manglish)",
+            "hi": "Hindi (Romanized / Hinglish)",
+            "en": "English",
+        }.get(language, "English")
+
         prompt = (
-            f"You are a helpful customer support AI. The user's query has been verified as: '{intent}'. "
+            f"You are a courteous customer support assistant. The user's intent is classified as: '{intent}'.\n"
             f"User message: \"{query}\"\n"
-            f"Respond politely and helpfully in 1 or 2 concise sentences matching their exact language."
+            f"Reply in 1 or 2 polite sentences matching their language ({lang_prompt})."
         )
         url = f"{UPSTREAM_BASE_URL}/chat/completions"
         headers = {"Authorization": f"Bearer {GEMINI_API_KEY}", "Content-Type": "application/json"}
@@ -230,15 +274,17 @@ async def resolve_path_a_response(
             "model": UPSTREAM_MODEL,
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 100,
+            "temperature": 0.3,
         }
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with httpx.AsyncClient(timeout=4.0) as client:
                 res = await client.post(url, json=payload, headers=headers)
-                data = res.json()
-                if isinstance(data, dict) and "choices" in data and data["choices"]:
-                    return data["choices"][0]["message"]["content"]
+                if res.status_code == 200:
+                    data = res.json()
+                    if "choices" in data and data["choices"]:
+                        return data["choices"][0]["message"]["content"].strip()
         except Exception:
             pass
 
-    # Default to CRM template
+    # Default robust fallback to CRM template
     return generate_crm_response(query, intent, language)
