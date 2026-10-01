@@ -407,6 +407,9 @@
             });
         });
 
+        // ─── Chat History State ─────────────────────────────────
+        var chatHistory = [];
+
         // ─── Export CSV ──────────────────────────────────────────
         document.getElementById('btn-export-csv').addEventListener('click', function() {
             window.location.href = '/api/logs/export';
@@ -416,7 +419,13 @@
         document.getElementById('btn-clear-logs').addEventListener('click', function() {
             if (!confirm('Clear all telemetry logs from database?')) return;
             fetch('/api/logs/clear', { method: 'POST' })
-                .then(function() { fetchStats(); })
+                .then(function() { 
+                    fetchStats(); 
+                    // Clear UI state as well
+                    container.style.display = 'none';
+                    respText.innerText = '';
+                    chatHistory = [];
+                })
                 .catch(function(e) { alert('Failed to clear logs: ' + e); });
         });
 
@@ -509,13 +518,16 @@
             submitBtn.disabled = true;
             var t0 = performance.now();
 
+            // Append user message to history
+            chatHistory.push({ role: 'user', content: q });
+
             fetch('/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: 'pelid-auto',
                     stream: isStream,
-                    messages: [{ role: 'user', content: q }]
+                    messages: chatHistory
                 })
             })
             .then(function(res) {
@@ -530,6 +542,8 @@
                         respPill.innerText = 'Error ' + res.status;
                         respPill.style.background = 'rgba(248, 113, 113, 0.2)';
                         respPill.style.color = 'var(--danger)';
+                        // Revert history on error
+                        chatHistory.pop();
                         throw new Error('HTTP_ERROR');
                     });
                 }
@@ -540,6 +554,7 @@
                     var decoder = new TextDecoder();
                     var buffer = '';
                     var hasStarted = false;
+                    var fullResponseText = '';
 
                     function readChunk() {
                         return reader.read().then(function(result) {
@@ -562,6 +577,7 @@
                                                 hasStarted = true;
                                             }
                                             respText.innerText += delta.content;
+                                            fullResponseText += delta.content;
                                         }
                                     } catch (_) {}
                                 }
@@ -575,6 +591,8 @@
                         respPill.innerText = 'STREAM COMPLETED \u00b7 ~' + elapsed + 'ms';
                         respPill.style.background = 'rgba(52, 211, 153, 0.2)';
                         respPill.style.color = 'var(--success)';
+                        // Save assistant response to history
+                        chatHistory.push({ role: 'assistant', content: fullResponseText });
                     });
                 } else {
                     // Non-streaming JSON mode
@@ -590,6 +608,7 @@
 
                         var meta = data.pelid_metadata || {};
                         respText.innerText = content;
+                        chatHistory.push({ role: 'assistant', content: content });
 
                         if (meta.path === 'A') {
                             var cacheTag = meta.cache_hit ? ('\u26A1 CACHE HIT (' + meta.cache_hit + ')') : 'PATH A (LOCAL)';
@@ -615,6 +634,7 @@
                     respPill.innerText = 'Connection Error';
                     respPill.style.background = 'rgba(248, 113, 113, 0.2)';
                     respPill.style.color = 'var(--danger)';
+                    chatHistory.pop(); // Remove user query if failed
                 }
             })
             .finally(function() {

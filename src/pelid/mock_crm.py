@@ -86,10 +86,10 @@ MOCK_ORDERS: Dict[str, Dict[str, Any]] = {
 
 def extract_order_id(text: str) -> Optional[str]:
     """
-    Extract order ID reference from a user query (e.g. #9921, 9921, ORD-1042).
+    Extract order ID reference from a user query (e.g. #9921, 9921, ORD-1042, ID is 69696969).
     """
-    # 1. Match explicit #1234 or ORD-1234
-    match = re.search(r"(?:#|ord-?|order\s*(?:id|no|#)?\s*)([0-9]{3,6})\b", text, re.IGNORECASE)
+    # 1. Match explicit #1234 or ORD-1234 or "ID is 1234"
+    match = re.search(r"(?:#|ord-?|order\s*(?:id|no|#|-id)?\s*|-id\s*|id\s+is\s+|id\s*)([0-9]{3,10})\b", text, re.IGNORECASE)
     if match:
         return match.group(1)
 
