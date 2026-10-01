@@ -70,3 +70,4 @@ test_*.py
 scripts/build_*.py
 scripts/train_*.py
 scripts/generate_*.py
+static/

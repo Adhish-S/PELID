@@ -41,9 +41,6 @@ COPY pelid.yaml ./pelid.yaml
 RUN mkdir -p /app/data
 COPY data/intents.txt ./data/intents.txt
 
-# Optional static dashboard (if present)
-COPY static/ ./static/
-
 # 5. Install pelid in editable / production mode
 RUN pip install --no-cache-dir -e .
 
