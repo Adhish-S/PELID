@@ -1,5 +1,5 @@
 # Pelid Multi-Domain Configuration Manifest
-# Define your domain, custom intents, and destructive action safety rules.
+# Define your domain, custom intents, declarative business actions, and safety rules.
 
 active_domain: ecommerce
 
@@ -27,6 +27,62 @@ domains:
         - billing_dispute
         - delete_account
         - shipping_address_change
+
+    # Declarative Business Actions (Path A Resolution)
+    # Eliminates hardcoded Python strings. Executes REST APIs / Webhooks or falls back to local sandbox.
+    actions:
+      order_status:
+        slots: ["order_id"]
+        prompt_for_slots:
+          en: "I would be glad to check your order status! Could you please provide your Order ID or tracking number?"
+          hi: "Main aapke order ka status check karne mein madad kar sakta hoon. Kripya apna Order ID batayein?"
+          ml: "Ningalude order status check cheyyam! Dayavayi Order ID athallekil tracking number share cheyyamo?"
+        action:
+          type: "http"
+          method: "GET"
+          url: "https://api.yourstore.com/v1/orders/{order_id}"
+          headers:
+            Authorization: "Bearer ${STORE_API_KEY}"
+          timeout_ms: 250
+          fallback_to_mock: true
+        response:
+          en: "Order {order_id} ({item}) is currently '{status}' via {courier} (Tracking #{tracking_num}). Estimated delivery: {eta}."
+          hi: "Aapka Order {order_id} ({item}) filhaal '{status}' hai via {courier} (Tracking #{tracking_num}). Expected delivery: {eta}."
+          ml: "Ningalude Order {order_id} ({item}) ippo '{status}' aayi irikkukayanu via {courier} (Tracking #{tracking_num}). Expected delivery: {eta}."
+        not_found:
+          en: "I couldn't find an order with ID {order_id}. Please verify the number from your confirmation email or SMS."
+          hi: "Humein {order_id} se koi order nahi mila. Kripya apna order number confirmation SMS/email se check karein."
+          ml: "{order_id} vechu oru order-um kandethan kazhinjilla. Dayavayi confirmation SMS/email-il ninnu verify cheyyamo?"
+
+      order_delayed_or_missing:
+        slots: ["order_id"]
+        prompt_for_slots:
+          en: "We sincerely apologize for the delay. Please share your Order ID and we will trace it immediately with logistics."
+          hi: "Delivery delay ke liye humein khed hai. Kripya apna Order ID share karein, hum turant logistics team se track karenge."
+          ml: "Delivery delay aayathil kshamikkuka. Dayavayi Order ID share cheyyamo? Njangal udan thanne trace cheyyaam."
+        action:
+          type: "http"
+          method: "GET"
+          url: "https://api.yourstore.com/v1/orders/{order_id}/trace"
+          timeout_ms: 250
+          fallback_to_mock: true
+        response:
+          en: "Your delayed package for Order {order_id} ({item}) has been expedited with {courier}. Updated ETA: {eta}."
+          hi: "Aapke Order {order_id} ({item}) ka shipment {courier} ke saath expedite kar diya gaya hai. Updated ETA: {eta}."
+          ml: "Ningalude Order {order_id} ({item}) {courier} vazhi expedite cheythittundu. Puthukkiya ETA: {eta}."
+        not_found:
+          en: "I couldn't find an order with ID {order_id}. Please verify the number from your confirmation email or SMS."
+          hi: "Humein {order_id} se koi order nahi mila. Kripya apna order number check karein."
+          ml: "{order_id} vechu oru order-um kandethan kazhinjilla. Dayavayi verify cheyyamo?"
+
+      invoice_or_receipt:
+        slots: []
+        action:
+          type: "mock"
+        response:
+          en: "You can download your official GST tax invoice directly from the 'Orders' section in your account."
+          hi: "Aap apna formal GST invoice account ke 'Orders' section se direct download kar sakte hain."
+          ml: "Ningalude official GST tax invoice account-ile 'Orders' section-il ninnu download cheyyaan kazhiyum."
 
   food_delivery:
     name: "On-Demand Food & Quick-Commerce"

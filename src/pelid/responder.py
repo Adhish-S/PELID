@@ -20,6 +20,8 @@ Modes supported:
 import os
 from typing import Optional
 from pelid.mock_crm import extract_order_id, lookup_order
+from pelid.slot_extractor import extract_slots
+from pelid.action_engine import get_action_engine
 
 # Default response mode: "template", "free_gemini", or "slm"
 RESPONDER_MODE = os.getenv("PELID_RESPONDER_MODE", "template").lower()
@@ -148,50 +150,31 @@ RESPONSES_MANGLISH = {
 def generate_crm_response(query: str, intent: str, language: str = "en") -> str:
     """
     Generate an ergonomic, human-like response for Path A resolutions.
-    Integrates with Mock CRM for live order lookups in the user's language.
+    Integrates with Declarative Action Engine and Mock CRM for live order lookups.
     """
-    # 1. Check for Order Lookup if query relates to order status or delay
-    if intent in ("order_status", "order_delayed_or_missing"):
-        order_id = extract_order_id(query)
-        if order_id:
-            order = lookup_order(order_id)
-            if order:
-                if language == "ml":
-                    return (
-                        f"Ningalude Order {order['order_id']} ({order['item']}) ippo "
-                        f"'{order['status']}' aayi irikkukayanu via {order['courier']} (Tracking #{order['tracking_num']}). "
-                        f"Expected delivery: {order['eta']}."
-                    )
-                elif language == "hi":
-                    return (
-                        f"Aapka Order {order['order_id']} ({order['item']}) filhaal "
-                        f"'{order['status']}' hai via {order['courier']} (Tracking #{order['tracking_num']}). "
-                        f"Expected delivery: {order['eta']}."
-                    )
-                else:
-                    return (
-                        f"Order {order['order_id']} ({order['item']}) is currently "
-                        f"'{order['status']}' via {order['courier']} (Tracking #{order['tracking_num']}). "
-                        f"Estimated delivery: {order['eta']}."
-                    )
-            else:
-                if language == "ml":
-                    return (
-                        f"#{order_id} vechu oru order-um kandethan kazhinjilla. "
-                        f"ദയവായി confirmation SMS/email-il ninnu order number verify cheyyamo?"
-                    )
-                elif language == "hi":
-                    return (
-                        f"Humein #{order_id} se koi order nahi mila. "
-                        f"Please confirmation SMS ya email se order number verify karein."
-                    )
-                else:
-                    return (
-                        f"I couldn't find an order with ID #{order_id}. "
-                        f"Please verify the number from your confirmation email or SMS."
-                    )
+    # 1. Extract dynamic parameter slots from query (e.g. order_id, email)
+    slots = extract_slots(query)
 
-    # 2. Select Language-Appropriate Conversational Template
+    # 2. Check if Declarative Action Engine has a defined action in pelid.yaml
+    action_engine = get_action_engine()
+    intent_cfg = action_engine.get_intent_config(intent)
+    if intent_cfg:
+        required_slots = intent_cfg.get("slots", intent_cfg.get("required_slots", []))
+        missing = [s for s in required_slots if s not in slots or not slots[s]]
+        if missing:
+            prompt_templates = intent_cfg.get("prompt_for_slots", {})
+            return prompt_templates.get(language, prompt_templates.get("en", f"Could you please provide your {missing[0].replace('_', ' ')}?"))
+
+        # Synchronous execution uses mock data resolver
+        mock_data = action_engine._execute_mock_action(intent, slots)
+        if mock_data:
+            context = dict(slots)
+            context.update(mock_data)
+            return action_engine._render_template(intent_cfg.get("response", {}), context, language)
+        else:
+            return action_engine._render_not_found(intent_cfg, slots, language)
+
+    # 3. Select Language-Appropriate Conversational Template from Bank
     if language == "ml" and intent in RESPONSES_MANGLISH:
         return RESPONSES_MANGLISH[intent]
     elif language == "hi" and intent in RESPONSES_HINGLISH:
@@ -211,11 +194,21 @@ async def resolve_path_a_response(
     """
     Entry point for generating the final assistant message for Path A.
     Dispatches to:
-    1. 'template' (Default): Zero-latency, zero-hallucination deterministic CRM lookup (<1ms, $0.00).
+    1. 'template' (Default): Executes declarative action from pelid.yaml (REST API / CRM lookup).
     2. 'slm': On-device / local small language model (e.g. Ollama / llama.cpp / vLLM Qwen2.5-0.5B).
     3. 'free_gemini': Grounded micro-LLM via Google Gemini API with local intent gating.
     """
     if RESPONDER_MODE == "template":
+        # 1. Dynamic Slot Extraction
+        slots = extract_slots(query)
+
+        # 2. Asynchronous Declarative Action Execution (REST API / Webhook)
+        action_engine = get_action_engine()
+        rendered_action = await action_engine.execute_action(intent, slots, language)
+        if rendered_action:
+            return rendered_action
+
+        # Fallback to standard CRM templates
         return generate_crm_response(query, intent, language)
 
     elif RESPONDER_MODE == "slm":
