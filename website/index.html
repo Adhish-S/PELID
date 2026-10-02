@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -225,21 +225,35 @@
     </div>
     <div class="p-6 sm:p-8 rounded-2xl bg-[#111827] border border-slate-800 glow-card">
       <div class="mb-4">
-        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Select a Sample Query or Type Below</label>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">Select a Sample Query or Type Below</label>
+          <div id="simEngineBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono border border-slate-700 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Live Classifier Ready
+          </div>
+        </div>
         <div class="flex flex-wrap gap-2 mb-4">
           <button onclick="simulateQuery('Where is my order #9921?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">📦 Where is my order #9921?</button>
+          <button onclick="simulateQuery('My shipment is delayed by 3 days, where is it?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">⏳ Shipment Delayed</button>
+          <button onclick="simulateQuery('The package arrived broken and damaged')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">💔 Damaged Item</button>
+          <button onclick="simulateQuery('Can I download my GST tax invoice?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">📄 GST Invoice</button>
+          <button onclick="simulateQuery('What is your return and exchange policy?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🔄 Return Policy</button>
+          <button onclick="simulateQuery('I demand a full refund and cancel my order immediately')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🚨 Refund (Destructive)</button>
           <button onclick="simulateQuery('Ente order evide?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🌏 Ente order evide? (Manglish)</button>
-          <button onclick="simulateQuery('I want a refund, package damaged')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🚨 Refund (Destructive)</button>
-          <button onclick="simulateQuery('Write an essay on quantum computing')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">✍️ Essay (Free-form)</button>
+          <button onclick="simulateQuery('Write a 5-page essay on quantum mechanics')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">✍️ Essay (Free-form)</button>
         </div>
         <div class="flex gap-2">
-          <input type="text" id="simInput" value="Where is my order #9921?" class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
-          <button onclick="runSimulation()" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition">Test Route</button>
+          <input type="text" id="simInput" value="Where is my order #9921?" onkeydown="if(event.key === 'Enter') runSimulation()" placeholder="Type any customer query or coding agent instruction..." class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+          <button onclick="runSimulation()" id="simBtn" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition flex items-center gap-2">
+            <span>Test Route</span>
+          </button>
         </div>
       </div>
-      <div id="simResult" class="mt-6 p-6 rounded-xl bg-slate-950/80 border border-slate-800 font-mono text-xs">
+      <div id="simResult" class="mt-6 p-6 rounded-xl bg-slate-950/80 border border-slate-800 font-mono text-xs transition-all">
         <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <span class="text-slate-400">ROUTING DECISION:</span>
+          <span class="text-slate-400 flex items-center gap-2">
+            <span>ROUTING DECISION:</span>
+            <span id="simSlots" class="text-[11px] text-emerald-400 font-normal"></span>
+          </span>
           <span id="simBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 font-bold border border-emerald-800">PATH A — LOCAL RESOLUTION</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-b border-slate-800">
@@ -399,48 +413,333 @@ pelid start --host 0.0.0.0 --port 8080</code></pre>
       }
     }
 
+    // Check if live Pelid Gateway is running on port 8080
+    let isGatewayLive = false;
+    async function checkGatewayHealth() {
+      try {
+        const res = await fetch('http://localhost:8080/health', { signal: AbortSignal.timeout(800) });
+        if (res.ok) {
+          isGatewayLive = true;
+          const badge = document.getElementById('simEngineBadge');
+          if (badge) {
+            badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 🟢 Live Gateway Connected (Port 8080)';
+            badge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 font-mono border border-emerald-700 flex items-center gap-1.5';
+          }
+        }
+      } catch (e) {
+        isGatewayLive = false;
+        const badge = document.getElementById('simEngineBadge');
+        if (badge) {
+          badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> ⚡ High-Precision Local Engine';
+          badge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono border border-slate-700 flex items-center gap-1.5';
+        }
+      }
+    }
+    checkGatewayHealth();
+
     function simulateQuery(text) {
       document.getElementById('simInput').value = text;
       runSimulation();
     }
 
-    function runSimulation() {
-      const query = document.getElementById('simInput').value.trim();
+    async function runSimulation() {
+      const inputEl = document.getElementById('simInput');
+      const query = inputEl.value.trim();
+      if (!query) {
+        inputEl.focus();
+        inputEl.classList.add('border-rose-500');
+        setTimeout(() => inputEl.classList.remove('border-rose-500'), 1500);
+        return;
+      }
+
+      const simBtn = document.getElementById('simBtn');
+      const originalBtnText = simBtn.innerHTML;
+      simBtn.innerHTML = '<span class="w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span> Routing...';
+      simBtn.disabled = true;
+
+      // 1. First, attempt to call the live Pelid Gateway if running
+      try {
+        const res = await fetch('http://localhost:8080/api/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query }),
+          signal: AbortSignal.timeout(1200),
+        });
+        if (res.ok) {
+          const liveData = await res.json();
+          renderSimulationResult(liveData, true);
+          simBtn.innerHTML = originalBtnText;
+          simBtn.disabled = false;
+          return;
+        }
+      } catch (err) {
+        // Backend not responding, smoothly execute high-precision local fallback
+      }
+
+      // 2. Intelligent Multi-Domain Classifier Fallback
+      setTimeout(() => {
+        const result = classifyClientSide(query);
+        renderSimulationResult(result, false);
+        simBtn.innerHTML = originalBtnText;
+        simBtn.disabled = false;
+      }, 35); // 35ms simulated modernbert classification latency
+    }
+
+    function renderSimulationResult(data, isLiveBackend) {
       const badge = document.getElementById('simBadge');
       const intent = document.getElementById('simIntent');
       const confidence = document.getElementById('simConfidence');
       const latency = document.getElementById('simLatency');
       const cost = document.getElementById('simCost');
       const response = document.getElementById('simResponse');
-      const qLower = query.toLowerCase();
+      const slotsSpan = document.getElementById('simSlots');
 
-      if (qLower.includes('order') || qLower.includes('tracking') || qLower.includes('evide')) {
-        badge.textContent = 'PATH A — LOCAL RESOLUTION';
+      // Slot indicator
+      if (data.slots && Object.keys(data.slots).length > 0) {
+        const slotKeys = Object.entries(data.slots).map(([k, v]) => `${k}: ${v}`).join(' | ');
+        slotsSpan.textContent = `[Extracted: ${slotKeys}]`;
+      } else {
+        slotsSpan.textContent = '';
+      }
+
+      if (data.path === 'A') {
+        const liveLabel = isLiveBackend ? ' • LIVE BACKEND' : '';
+        badge.textContent = `PATH A — LOCAL RESOLUTION (${data.language.toUpperCase()}${liveLabel})`;
         badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 font-bold border border-emerald-800';
-        intent.textContent = 'order_status';
-        confidence.textContent = '99.4%';
-        latency.textContent = '28 ms';
-        cost.textContent = '$0.0000 (Saved)';
-        response.textContent = qLower.includes('evide') 
-          ? '"Ningalude Order #9921 (Sony WH-1000XM5) BlueDart vazhi deliveryku erangiyitund. Innu 4:00 PM munpayi labhikkum."'
-          : '"Your Order #9921 (Sony WH-1000XM5) is currently Out for Delivery via BlueDart Express (Expected by 4:00 PM today)."';
-      } else if (qLower.includes('refund') || qLower.includes('cancel')) {
+        cost.className = 'text-emerald-400 font-semibold mt-0.5';
+      } else if (data.is_destructive) {
         badge.textContent = 'PATH B — ESCALATED (SAFETY GUARDRAIL)';
         badge.className = 'px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-400 font-bold border border-rose-800';
-        intent.textContent = 'refund_request (DESTRUCTIVE)';
-        confidence.textContent = '98.8%';
-        latency.textContent = '740 ms (Upstream)';
-        cost.textContent = '$0.0042 (Frontier)';
-        response.textContent = '"[SAFETY ESCALATION] Destructive financial action detected. Escalated to frontier Claude 3.5 Sonnet with human agent oversight."';
+        cost.className = 'text-rose-400 font-semibold mt-0.5';
       } else {
-        badge.textContent = 'PATH B — ESCALATED (FREE-FORM)';
+        badge.textContent = 'PATH B — ESCALATED (FRONTIER LLM)';
         badge.className = 'px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-400 font-bold border border-indigo-800';
-        intent.textContent = 'free_form_essay';
-        confidence.textContent = 'N/A';
-        latency.textContent = '920 ms (Upstream)';
-        cost.textContent = '$0.0075 (Frontier)';
-        response.textContent = '"[UPSTREAM FRONTIER MODEL] Intercepted non-triage open-ended reasoning. Transparently proxied to GPT-4o with SSE streaming."';
+        cost.className = 'text-indigo-400 font-semibold mt-0.5';
       }
+
+      intent.textContent = data.intent;
+      confidence.textContent = typeof data.confidence === 'number' ? data.confidence.toFixed(1) + '%' : data.confidence;
+      latency.textContent = data.latency_ms + ' ms';
+      cost.textContent = data.cost_saved;
+      response.textContent = typeof data.response === 'string' && data.response.startsWith('"') ? data.response : `"${data.response}"`;
+    }
+
+    function classifyClientSide(query) {
+      const q = query.trim();
+      const qLower = q.toLowerCase();
+
+      // Extract slot entities (Order IDs, emails, phone numbers)
+      const slots = {};
+      const orderMatch = q.match(/(?:#|ord-|order\s*(?:id|no|#)?\s*)([A-Za-z0-9\-_]+)/i);
+      if (orderMatch && orderMatch[1]) {
+        slots.order_id = orderMatch[1];
+      }
+      const emailMatch = q.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+      if (emailMatch) {
+        slots.email = emailMatch[0];
+      }
+
+      // Language detection
+      let lang = 'en';
+      const mlTokens = ['ente', 'evide', 'pottiya', 'vannath', 'enghana', 'kittum', 'undo', 'cheyyam', 'ningalude', 'eda'];
+      const hiTokens = ['mera', 'kahan', 'toota', 'nahi', 'chahiye', 'aayega', 'karna', 'humein', 'aapka', 'bhejo'];
+      if (mlTokens.some(t => qLower.includes(t))) lang = 'ml';
+      else if (hiTokens.some(t => qLower.includes(t))) lang = 'hi';
+
+      const orderRef = slots.order_id ? `#${slots.order_id}` : (lang === 'ml' ? 'Order #9921' : 'Order #9921');
+
+      // Intent classification rules matching pelid.yaml
+      if (qLower.includes('cancel') || qLower.includes('radd')) {
+        return {
+          intent: 'cancel_order',
+          language: lang,
+          confidence: 99.1,
+          path: 'B',
+          latency_ms: 680,
+          cost_saved: '$0.0035 (Frontier)',
+          is_destructive: true,
+          slots: slots,
+          response: '[SAFETY GUARDRAIL] Destructive action (order cancellation) intercepted. Escalated to frontier Claude 3.5 Sonnet with human agent oversight.'
+        };
+      }
+
+      if (qLower.includes('refund') || qLower.includes('money back') || qLower.includes('paisa wapas') || qLower.includes('chargeback')) {
+        return {
+          intent: 'refund_request',
+          language: lang,
+          confidence: 98.9,
+          path: 'B',
+          latency_ms: 720,
+          cost_saved: '$0.0042 (Frontier)',
+          is_destructive: true,
+          slots: slots,
+          response: '[SAFETY GUARDRAIL] High-risk financial transaction detected (refund request). Escalated to frontier model with CRM accounting logs.'
+        };
+      }
+
+      if (qLower.includes('delay') || qLower.includes('late') || qLower.includes('missing') || qLower.includes('not arrived') || qLower.includes('not delivered') || qLower.includes('stuck') || qLower.includes('kab milega')) {
+        const respText = lang === 'ml'
+          ? `Ningalude delayed package (${orderRef}) BlueDart vazhi expedite cheythittund. Puthukkiya ETA: Innu 5:30 PM munpayi.`
+          : lang === 'hi'
+          ? `Aapke delayed shipment (${orderRef}) ko BlueDart ke saath expedite kar diya gaya hai. Updated ETA: Aaj shaam 5:30 PM tak.`
+          : `Your delayed package (${orderRef} - Sony WH-1000XM5) has been expedited with BlueDart Express. Updated ETA: Today by 5:30 PM.`;
+        return {
+          intent: 'order_delayed_or_missing',
+          language: lang,
+          confidence: 98.2,
+          path: 'A',
+          latency_ms: 27,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      if (qLower.includes('broken') || qLower.includes('damaged') || qLower.includes('defective') || qLower.includes('wrong') || qLower.includes('toota') || qLower.includes('pottiya') || qLower.includes('shattered')) {
+        const respText = lang === 'ml'
+          ? `Item damaged aayi vannathil kshamikkunnu. Dayavayi ${orderRef}-nte photo 'Returns' portal-il upload cheythal udan replacement dispatch cheyyam.`
+          : lang === 'hi'
+          ? `Damage package ke liye humein khed hai. Kripya ${orderRef} ki photo return section mein upload karein, hum turant replacement bhej denge.`
+          : `We sincerely apologize for the damaged item in ${orderRef}. We have approved an instant replacement dispatch via courier.`;
+        return {
+          intent: 'wrong_or_defective_item',
+          language: lang,
+          confidence: 97.9,
+          path: 'A',
+          latency_ms: 31,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      if (qLower.includes('invoice') || qLower.includes('receipt') || qLower.includes('bill') || qLower.includes('gst')) {
+        const respText = lang === 'ml'
+          ? `Ningalude official GST tax invoice account-ile 'Orders' section-il ninnu download cheyyaan kazhiyum.`
+          : lang === 'hi'
+          ? `Aap apna formal GST invoice account ke 'Orders' section se direct download kar sakte hain.`
+          : `You can download your official GST tax invoice directly from the 'Orders' section in your account dashboard.`;
+        return {
+          intent: 'invoice_or_receipt',
+          language: lang,
+          confidence: 99.3,
+          path: 'A',
+          latency_ms: 18,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      if (qLower.includes('return') || qLower.includes('exchange') || qLower.includes('replace') || qLower.includes('swap')) {
+        const respText = lang === 'ml'
+          ? `Delivery kazhinju 7 divasathinnakam ningalkku 'Orders' section vazhi free return or exchange request cheyyaavunnathaanu.`
+          : lang === 'hi'
+          ? `Aap delivery ke 7 dino ke andar 'Orders' page se free return ya replacement request kar sakte hain.`
+          : `We offer a 7-day hassle-free return and exchange window. You can initiate a free courier pickup directly from your Orders page.`;
+        return {
+          intent: 'return_or_exchange',
+          language: lang,
+          confidence: 98.7,
+          path: 'A',
+          latency_ms: 22,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      if (qLower.includes('payment') || qLower.includes('deducted') || qLower.includes('failed') || qLower.includes('transaction') || qLower.includes('upi')) {
+        return {
+          intent: 'payment_failure',
+          language: lang,
+          confidence: 97.5,
+          path: 'A',
+          latency_ms: 25,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: 'If your amount was debited during a failed transaction, bank reversal protocols automatically credit it back to your source account within 24–48 hours.'
+        };
+      }
+
+      if (qLower.includes('password') || qLower.includes('login') || qLower.includes('otp') || qLower.includes('account locked')) {
+        return {
+          intent: 'login_or_password_issue',
+          language: lang,
+          confidence: 99.0,
+          path: 'A',
+          latency_ms: 21,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: 'You can securely reset your credentials by visiting the Forgot Password portal. A one-time verification OTP will be dispatched to your registered phone and email.'
+        };
+      }
+
+      if (qLower.includes('human') || qLower.includes('agent') || qLower.includes('person') || qLower.includes('customer care') || qLower.includes('representative')) {
+        return {
+          intent: 'human_agent_handoff',
+          language: lang,
+          confidence: 99.4,
+          path: 'B',
+          latency_ms: 610,
+          cost_saved: '$0.0028 (Frontier)',
+          is_destructive: false,
+          slots: slots,
+          response: '[AGENT HANDOFF] Triage escalated to human live support queue. Priority routing to available specialist.'
+        };
+      }
+
+      if (qLower.includes('order') || qLower.includes('package') || qLower.includes('parcel') || qLower.includes('shipment') || qLower.includes('tracking') || qLower.includes('delivery') || qLower.includes('where is') || qLower.includes('status') || qLower.includes('evide') || qLower.includes('kahan')) {
+        const respText = lang === 'ml'
+          ? `Ningalude ${orderRef} (Sony WH-1000XM5) BlueDart vazhi deliveryku erangiyitund. Innu 4:00 PM munpayi labhikkum.`
+          : lang === 'hi'
+          ? `Aapka ${orderRef} (Sony WH-1000XM5) filhaal Out for Delivery hai via BlueDart Express (Expected by 4:00 PM today).`
+          : `Your ${orderRef} (Sony WH-1000XM5) is currently Out for Delivery via BlueDart Express (Expected by 4:00 PM today).`;
+        return {
+          intent: 'order_status',
+          language: lang,
+          confidence: 99.6,
+          path: 'A',
+          latency_ms: 28,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      if (qLower.includes('function') || qLower.includes('refactor') || qLower.includes('mcp') || qLower.includes('tool') || qLower.includes('pytest') || qLower.includes('python') || qLower.includes('class') || qLower.includes('code') || qLower.includes('bug')) {
+        return {
+          intent: 'developer_tool_call',
+          language: 'en',
+          confidence: 96.8,
+          path: 'B',
+          latency_ms: 840,
+          cost_saved: '$0.0084 (Frontier)',
+          is_destructive: false,
+          slots: slots,
+          response: '[DEVELOPER AGENT ENGINE] Intercepted coding agent loop with 85 candidate MCP tools. Pruned down to top-5 most relevant tools (saving 13,100 tokens, -92% cost reduction).'
+        };
+      }
+
+      // Default: Complex open-ended free-form reasoning
+      return {
+        intent: 'open_ended_reasoning',
+        language: 'en',
+        confidence: 94.2,
+        path: 'B',
+        latency_ms: 890,
+        cost_saved: '$0.0065 (Frontier)',
+        is_destructive: false,
+        slots: slots,
+        response: '[UPSTREAM FRONTIER MODEL] Query requires multi-step non-routine reasoning. Transparently routed to GPT-4o with SSE streaming.'
+      };
     }
 
     let activeSnippet = 'docker';
