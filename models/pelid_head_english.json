@@ -23,7 +23,7 @@
     "update_account_details",
     "wrong_or_defective_item"
   ],
-  "temperature": 1.6868172883987427,
-  "test_accuracy": 99.19354915618896,
-  "calibrated_ece": 0.011187917234947609
+  "temperature": 1.9284136295318604,
+  "test_accuracy": 82.2580635547638,
+  "calibrated_ece": 0.03566555169278485
 }
