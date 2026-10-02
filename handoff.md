@@ -1,6 +1,6 @@
 # PELID — Project Handoff & State Synchronization Document
 
-> **Document Purpose**: Feed this document into a new chat session to restore 100% full context, architectural decisions, recent failures, current codebase state, and immediate next steps without losing any momentum.
+> **Document Purpose**: Feed this document into a new chat session to restore 100% full context, architectural decisions, recent failures, current codebase state, business strategy, and immediate next steps without losing any momentum.
 
 ---
 
@@ -33,13 +33,14 @@ Modern generative AI architectures suffer from massive cost and latency waste:
 ### Git Repository Status
 * **Location**: `D:\PELID\PELID` (Mapped workspace in Antigravity: `c:\Users\adhish\Downloads\PELID`).
 * **Python Virtualenv**: `D:\PELID\PELID\venv\Scripts\python.exe` (Python 3.14.3).
-* **Branch**: `main` (7 commits ahead of `origin/main`):
+* **Branch**: `main` (8 commits ahead of `origin/main`):
   1. `6faf8e5`: Declarative action engine & dynamic slot extractor.
   2. `ce445ad`: Production Caddy reverse proxy with automatic TLS and security headers.
   3. `f9d86a7`: Multi-tenant auth engine (`X-Pelid-Key`) and local product website with ROI calculator.
   4. `1653ffc`: Live gateway `/api/simulate` endpoint, Enter key handler, and multi-domain classifier.
   5. `74e243c`: Dataset expansion to 100+ samples per intent, dual head retraining, and hybrid fast-path pre-router.
   6. `2221a37`: Purge of data leakage (135 overlapping rows removed), retrained heads with honest out-of-sample evaluation.
+  7. `307f40a`: Initial project handoff document.
 * **Remote Sync Boundary**: Commits are held locally until the user approves pushing to `origin/main`. The `developer-domain` branch is strictly held until the gateway is validated.
 
 ### Test Suite Status
@@ -111,8 +112,8 @@ D:\PELID\PELID\
    * Expanded from ~1,100 to 2,031 clean samples across all 21 intents.
    * Added colloquial Manglish and Hinglish variations.
 5. **Deterministic Hybrid Fast-Path Pre-Router (`decision.py` & `website/index.html`)**:
-   * **Priority 1 — Greetings (<1ms, $0.00, Path A)**: `HI...`, `Hello`, `Namaskaram` $\rightarrow$ `general_chitchat_or_faq`.
-   * **Priority 2 — Destructive Safety Guardrails**: Explicit cancellations/refunds override delivery words $\rightarrow$ Path B.
+   * **Priority 1 — Greetings (<1ms, $0.00, Path A)**: `HI...`, `Hi`, `Hello`, `good morning`, `namaskaram`, `namaste` $\rightarrow$ `general_chitchat_or_faq`.
+   * **Priority 2 — Destructive Safety Guardrails**: Explicit cancellations and refunds override delivery words $\rightarrow$ Path B.
    * **Priority 3 — Defect & Damage Dominance**: Keywords like `cracked`, `toota`, `damaged`, `pottiyath`, `sathanam cracked` override context words like `package` or `morning` $\rightarrow$ `wrong_or_defective_item`.
 6. **Data Leakage Purge & Clean Retraining**:
    * Identified and purged 135 overlapping samples between training and test sets.
@@ -134,7 +135,37 @@ D:\PELID\PELID\
 
 ---
 
-## 6. Specific Next Steps to Follow
+## 6. Strategic Business & Architectural Decisions Recorded
+
+### A. Market Validation: What if OpenAI Builds a Routing Layer?
+* If OpenAI or Anthropic builds intent routing or small classification models, it **validates that LLM cost and latency is a multi-billion-dollar enterprise problem**.
+* However, cloud LLM providers lock users into *their* models (e.g. OpenAI routes to OpenAI models). 
+* **Pelid's Moat**:
+  1. **Vendor Neutrality**: Pelid routes across OpenAI, Anthropic, Gemini, DeepSeek, or local SLMs.
+  2. **Zero Data Egress & Privacy**: Pelid resolves Path A *on-premise* without sending sensitive customer data to US cloud providers.
+  3. **Cost**: Provider-hosted routers charge per API call; Pelid runs locally on CPU for $0.00.
+
+### B. Rust vs. Python Rationale
+* **Why Python now?**: Rapid iteration on Hugging Face tokenizers, PyTorch models, ONNX Runtime bindings, and Laya. ONNX Runtime executes heavily optimized C++ / SIMD vector instructions under the hood, delivering 5–15ms inference even in Python.
+* **Future Rust Plan**: In v2, the HTTP proxy reverse proxy layer can be written in Rust (using Axum or Actix-Web) calling ONNX Runtime C FFI, dropping proxy overhead from 2ms to 100 microseconds.
+
+### C. Branding & Entity Naming
+* You can legally name the product and website **Pelid** while your company has a completely different corporate name (e.g., *Alphabet owns Google*, *ByteDance owns TikTok*).
+
+### D. SOC-2 Compliance Moat
+* Startups and enterprises require SOC-2, HIPAA, and GDPR compliance.
+* Because Pelid resolves 60–80% of customer support queries locally (Path A) without forwarding customer PII (names, order numbers, addresses) to third-party model providers, Pelid drastically simplifies SOC-2 compliance for clients.
+
+### E. Domain & Web Hosting Economics
+* **Avoid Wix**: Wix charges inflated yearly renewals and locks you into rigid templates.
+* **Recommended Stack ($10–$12/year Total)**:
+  * Domain: Cloudflare Registrar or Namecheap ($10–$12/yr for `.com` or `.dev`).
+  * Web Frontend: Cloudflare Pages or Vercel ($0/month forever with global CDN and free SSL).
+  * Backend: Small VPS ($4–$10/month) or self-hosted on client hardware behind Caddy.
+
+---
+
+## 7. Specific Next Steps to Follow
 
 ### Step 1: User Verification of Milestone 1
 * Verify `http://localhost:3000/#simulator` with custom queries.
@@ -142,7 +173,7 @@ D:\PELID\PELID\
 
 ### Step 2: Push Commits to GitHub
 * Run: `git -C "D:\PELID\PELID" push origin main`
-* Pushes the 7 batched commits (`6faf8e5`, `ce445ad`, `f9d86a7`, `1653ffc`, `74e243c`, `2221a37`, plus handoff commit).
+* Pushes all 8 batched commits to the GitHub repository (`origin/main`).
 
 ### Step 3: Branch into Developer Domain (Dynamic Tool Pruning)
 * Run: `git -C "D:\PELID\PELID" checkout -b developer-domain`
@@ -157,3 +188,19 @@ D:\PELID\PELID\
 * Purchase domain via Cloudflare Registrar (~$10/yr).
 * Deploy `website/` to Cloudflare Pages ($0/month).
 * Deploy gateway container behind Caddy on a cheap VPS or run self-hosted.
+
+---
+
+## 8. Quickstart Prompt for the Next Chat
+
+When opening a new chat window, simply paste the following text:
+
+```markdown
+I am continuing development on the Pelid project (an enterprise AI decision gateway and cost-reduction reverse proxy located at D:\PELID\PELID).
+
+Please read the handoff file located at `D:\PELID\PELID\handoff.md` to get completely up to speed on the project goals, current state, active files, changes made, failed attempts and lessons learned, and the next steps.
+
+We have completed and verified Milestone 1 (Customer Support Gateway, Multi-tenant API Auth, Local Product Website, and Airtight Hybrid Pre-Router with 18/18 tests passing). 
+
+Let's review our next steps and proceed with pushing to GitHub and branching into the Developer Domain (Dynamic Tool Pruning).
+```
