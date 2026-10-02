@@ -66,11 +66,32 @@ def init_db():
                 tokens_saved INTEGER NOT NULL DEFAULT 0,
                 cost_saved_usd REAL NOT NULL DEFAULT 0.0,
                 latency_ms REAL NOT NULL,
-                reason TEXT NOT NULL DEFAULT ''
+                reason TEXT NOT NULL DEFAULT '',
+                tenant_id TEXT NOT NULL DEFAULT 'default'
+            )
+        """)
+        # Ensure tenant_id column exists if table was previously created
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(request_logs)")
+        cols = [c[1] for c in cur.fetchall()]
+        if "tenant_id" not in cols:
+            conn.execute("ALTER TABLE request_logs ADD COLUMN tenant_id TEXT NOT NULL DEFAULT 'default'")
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS tenants (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                api_key_hash TEXT NOT NULL UNIQUE,
+                key_prefix TEXT NOT NULL,
+                rate_limit_rpm INTEGER NOT NULL DEFAULT 60,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL,
+                revoked_at TEXT
             )
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_timestamp ON request_logs(timestamp)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_path ON request_logs(path)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_tenant_id ON request_logs(tenant_id)")
         conn.commit()
 
 
@@ -85,6 +106,7 @@ def log_request(
     tokens_completion: int = 0,
     tokens_saved: int = 0,
     reason: str = "",
+    tenant_id: str = "default",
 ) -> int:
     """
     Log a processed request into SQLite with exact prompt and completion token cost accounting.
@@ -111,8 +133,8 @@ def log_request(
             INSERT INTO request_logs (
                 timestamp, query, intent, confidence, language, path,
                 tokens_prompt, tokens_completion, tokens_saved, cost_saved_usd,
-                latency_ms, reason
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                latency_ms, reason, tenant_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 now_iso,
@@ -127,6 +149,7 @@ def log_request(
                 cost_saved,
                 float(latency_ms),
                 reason,
+                tenant_id,
             ),
         )
         conn.commit()
@@ -144,14 +167,18 @@ def clear_logs() -> int:
     return deleted
 
 
-def get_analytics_summary() -> dict[str, Any]:
+def get_analytics_summary(tenant_id: Optional[str] = None) -> dict[str, Any]:
     """Calculate aggregated stats and multi-model financial comparisons across all requests."""
     init_db()
     with get_connection() as conn:
         cur = conn.cursor()
+        where_clause = " WHERE tenant_id = ?" if tenant_id else ""
+        where_and_path_a = " WHERE path = 'A' AND tenant_id = ?" if tenant_id else " WHERE path = 'A'"
+        where_and_path_b = " WHERE path = 'B' AND tenant_id = ?" if tenant_id else " WHERE path = 'B'"
+        params = (tenant_id,) if tenant_id else ()
 
         # Total counts
-        cur.execute("SELECT COUNT(*) FROM request_logs")
+        cur.execute(f"SELECT COUNT(*) FROM request_logs{where_clause}", params)
         total_requests = cur.fetchone()[0] or 0
 
         if total_requests == 0:
@@ -167,16 +194,17 @@ def get_analytics_summary() -> dict[str, Any]:
                 "projected_monthly_savings_100k": 0.0,
                 "avg_latency_path_a": 0.0,
                 "avg_latency_path_b": 0.0,
+                "tenant_id": tenant_id or "all",
             }
 
-        cur.execute("SELECT COUNT(*) FROM request_logs WHERE path = 'A'")
+        cur.execute(f"SELECT COUNT(*) FROM request_logs{where_and_path_a}", params)
         path_a_count = cur.fetchone()[0] or 0
 
         path_b_count = total_requests - path_a_count
         resolution_rate = (path_a_count / total_requests) * 100.0
 
         # Tokens and dollars saved
-        cur.execute("SELECT SUM(tokens_saved), SUM(cost_saved_usd) FROM request_logs")
+        cur.execute(f"SELECT SUM(tokens_saved), SUM(cost_saved_usd) FROM request_logs{where_clause}", params)
         row = cur.fetchone()
         tokens_saved = int(row[0] or 0)
         cost_saved_gpt4o = float(row[1] or 0.0)
@@ -188,14 +216,13 @@ def get_analytics_summary() -> dict[str, Any]:
         cost_saved_mini = cost_saved_gpt4o * 0.06
 
         # Average latencies
-        cur.execute("SELECT AVG(latency_ms) FROM request_logs WHERE path = 'A'")
+        cur.execute(f"SELECT AVG(latency_ms) FROM request_logs{where_and_path_a}", params)
         avg_a = cur.fetchone()[0] or 0.0
 
-        cur.execute("SELECT AVG(latency_ms) FROM request_logs WHERE path = 'B'")
+        cur.execute(f"SELECT AVG(latency_ms) FROM request_logs{where_and_path_b}", params)
         avg_b = cur.fetchone()[0] or 0.0
 
         # Projected monthly savings for a standard 100,000 requests/month volume
-        # Avg cost saved per local resolution * (100,000 * resolution_rate / 100)
         avg_saving_per_path_a = (cost_saved_gpt4o / path_a_count) if path_a_count > 0 else 0.0003
         projected_monthly_100k = (100_000 * (resolution_rate / 100.0)) * avg_saving_per_path_a
 
@@ -211,24 +238,38 @@ def get_analytics_summary() -> dict[str, Any]:
             "projected_monthly_savings_100k": round(projected_monthly_100k, 2),
             "avg_latency_path_a": round(avg_a, 1),
             "avg_latency_path_b": round(avg_b, 1),
+            "tenant_id": tenant_id or "all",
         }
 
 
-def get_recent_logs(limit: int = 50) -> list[dict[str, Any]]:
+def get_recent_logs(limit: int = 50, tenant_id: Optional[str] = None) -> list[dict[str, Any]]:
     """Retrieve the latest request logs formatted for the dashboard."""
     init_db()
     with get_connection() as conn:
         cur = conn.cursor()
-        cur.execute(
-            """
-            SELECT id, timestamp, query, intent, confidence, language, path,
-                   tokens_saved, latency_ms, reason
-            FROM request_logs
-            ORDER BY id DESC
-            LIMIT ?
-            """,
-            (limit,),
-        )
+        if tenant_id:
+            cur.execute(
+                """
+                SELECT id, timestamp, query, intent, confidence, language, path,
+                       tokens_saved, latency_ms, reason, tenant_id
+                FROM request_logs
+                WHERE tenant_id = ?
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (tenant_id, limit),
+            )
+        else:
+            cur.execute(
+                """
+                SELECT id, timestamp, query, intent, confidence, language, path,
+                       tokens_saved, latency_ms, reason, tenant_id
+                FROM request_logs
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (limit,),
+            )
         rows = cur.fetchall()
         return [dict(r) for r in rows]
 
@@ -244,7 +285,7 @@ def export_logs_csv() -> str:
         cur.execute(
             """
             SELECT id, timestamp, query, intent, confidence, language, path,
-                   tokens_prompt, tokens_completion, tokens_saved, cost_saved_usd, latency_ms, reason
+                   tokens_prompt, tokens_completion, tokens_saved, cost_saved_usd, latency_ms, reason, tenant_id
             FROM request_logs
             ORDER BY id ASC
             """
@@ -255,7 +296,7 @@ def export_logs_csv() -> str:
         writer = csv.writer(output)
         writer.writerow([
             "ID", "Timestamp", "Query", "Intent", "Confidence", "Language", "Path",
-            "PromptTokens", "CompletionTokens", "TokensSaved", "CostSavedUSD", "LatencyMS", "Reason"
+            "PromptTokens", "CompletionTokens", "TokensSaved", "CostSavedUSD", "LatencyMS", "Reason", "TenantID"
         ])
         for r in rows:
             writer.writerow(list(r))

@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelid — Enterprise AI Decision Gateway & Cost Optimizer</title>
+  <meta name="description" content="Drop-in reverse proxy that cuts 60-80% of LLM agent bills by intercepting lightweight decisions and resolving them locally at sub-60ms latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfdf5', 100: '#d1fae5', 400: '#34d399', 500: '#10b981', 600: '#059669' },
+            darkbg: '#0b0f19', cardbg: '#111827', bordercol: '#1f293d',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    .gradient-text {
+      background: linear-gradient(135deg, #34d399 0%, #38bdf8 50%, #818cf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .glow-card { box-shadow: 0 0 40px -10px rgba(16, 185, 129, 0.12); }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0b0f19] text-slate-200 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Ambient Glow -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-emerald-500/10 rounded-full blur-[140px]"></div>
+    <div class="absolute top-[600px] -right-40 w-[500px] h-[350px] bg-cyan-500/10 rounded-full blur-[140px]"></div>
+    <div class="absolute top-[1200px] -left-40 w-[500px] h-[350px] bg-indigo-500/10 rounded-full blur-[140px]"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-[#0b0f19]/80 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 font-bold text-white text-lg">P</div>
+        <span class="text-xl font-bold tracking-tight text-white">PELID</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 font-medium">v1.1 Enterprise</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#features" class="hover:text-emerald-400 transition-colors">Features</a>
+        <a href="#architecture" class="hover:text-emerald-400 transition-colors">Architecture</a>
+        <a href="#calculator" class="hover:text-emerald-400 transition-colors">ROI Calculator</a>
+        <a href="#simulator" class="hover:text-emerald-400 transition-colors">Simulator</a>
+        <a href="#quickstart" class="hover:text-emerald-400 transition-colors">Quickstart</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/Adhish-S/PELID" target="_blank" class="text-xs px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+          <span>GitHub</span>
+        </a>
+        <a href="#calculator" class="text-xs px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold shadow-md shadow-emerald-500/20 transition">Calculate Savings</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative pt-20 pb-16 px-6 text-center max-w-5xl mx-auto">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      Self-Hosted in your VPC &bull; Zero GPU Cost &bull; Multi-Tenant Ready
+    </div>
+    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.15] mb-6">
+      The Enterprise AI Gateway That <br class="hidden sm:block" />
+      <span class="gradient-text">Cuts 60–80% of Agent Costs</span>
+      <span class="block text-3xl sm:text-5xl mt-2 font-bold text-slate-100">at Sub-60ms Latency.</span>
+    </h1>
+    <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed mb-10">
+      Drop-in OpenAI proxy that intercepts routine conversational decisions and resolves them locally using calibrated ModernBERT heads (<span class="text-emerald-400 font-semibold">&lt;60ms, $0.00</span>), transparently escalating complex logic to frontier models.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+      <a href="#calculator" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition">Calculate Your ROI &rarr;</a>
+      <a href="#quickstart" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-sm transition">Run Docker Locally ($0.00)</a>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 rounded-2xl bg-[#111827]/70 border border-slate-800/80 backdrop-blur-md glow-card">
+      <div class="text-center"><div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">28ms</div><div class="text-xs text-slate-400 mt-1 uppercase font-medium">Path A Latency</div></div>
+      <div class="text-center"><div class="text-2xl sm:text-3xl font-extrabold text-cyan-400">55.8%</div><div class="text-xs text-slate-400 mt-1 uppercase font-medium">Net Token Cut</div></div>
+      <div class="text-center"><div class="text-2xl sm:text-3xl font-extrabold text-indigo-400">100%</div><div class="text-xs text-slate-400 mt-1 uppercase font-medium">Safety Override</div></div>
+      <div class="text-center"><div class="text-2xl sm:text-3xl font-extrabold text-purple-400">&lt;0.05ms</div><div class="text-xs text-slate-400 mt-1 uppercase font-medium">Exact L1 Cache</div></div>
+    </div>
+  </section>
+
+  <!-- ROI Calculator -->
+  <section id="calculator" class="py-20 px-6 max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <div class="text-emerald-400 font-semibold text-xs tracking-wider uppercase mb-2">Interactive Financial Modeler</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">How Much Will Pelid Save You?</h2>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">Adjust your agent traffic parameters below to calculate exact monthly & annual cost reductions.</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      <div class="lg:col-span-7 p-6 sm:p-8 rounded-2xl bg-[#111827] border border-slate-800 flex flex-col justify-between space-y-6">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-slate-300">Monthly LLM Requests</label>
+            <span id="requestsDisplay" class="text-sm font-bold text-emerald-400 font-mono">100,000 req</span>
+          </div>
+          <input type="range" id="requestsInput" min="10000" max="1000000" step="10000" value="100000" class="w-full accent-emerald-500 h-2 bg-slate-800 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[11px] text-slate-500 mt-1"><span>10K</span><span>250K</span><span>500K</span><span>1M</span></div>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-slate-300">Avg Prompt Tokens / Query</label>
+            <span id="tokensDisplay" class="text-sm font-bold text-cyan-400 font-mono">600 tokens</span>
+          </div>
+          <input type="range" id="tokensInput" min="100" max="4000" step="50" value="600" class="w-full accent-cyan-500 h-2 bg-slate-800 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[11px] text-slate-500 mt-1"><span>100</span><span>1,000</span><span>2,000</span><span>4,000</span></div>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-slate-300">Local Resolution Rate (Path A)</label>
+            <span id="rateDisplay" class="text-sm font-bold text-indigo-400 font-mono">65% local</span>
+          </div>
+          <input type="range" id="rateInput" min="30" max="90" step="1" value="65" class="w-full accent-indigo-500 h-2 bg-slate-800 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[11px] text-slate-500 mt-1"><span>30%</span><span>65% (Avg)</span><span>90%</span></div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Frontier Model Replaced</label>
+          <div class="grid grid-cols-3 gap-3">
+            <button onclick="selectModel('gpt-4o')" id="btn-gpt-4o" class="model-btn py-2.5 px-3 rounded-xl border text-xs font-semibold text-center transition border-emerald-500 bg-emerald-500/10 text-emerald-400">GPT-4o</button>
+            <button onclick="selectModel('claude-3-5')" id="btn-claude-3-5" class="model-btn py-2.5 px-3 rounded-xl border text-xs font-semibold text-center transition border-slate-700 bg-slate-800/40 text-slate-300 hover:border-slate-600">Claude 3.5</button>
+            <button onclick="selectModel('gpt-4o-mini')" id="btn-gpt-4o-mini" class="model-btn py-2.5 px-3 rounded-xl border text-xs font-semibold text-center transition border-slate-700 bg-slate-800/40 text-slate-300 hover:border-slate-600">GPT-4o-mini</button>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-5 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-[#111827] border border-emerald-500/30 flex flex-col justify-between relative overflow-hidden glow-card">
+        <div class="absolute -top-20 -right-20 w-44 h-44 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div>
+          <div class="text-xs font-semibold uppercase text-emerald-400 tracking-wider mb-1">Projected Return on Investment</div>
+          <div class="text-3xl sm:text-4xl font-extrabold text-white mt-2 font-mono" id="monthlySavingsDisplay">$0.00</div>
+          <div class="text-xs text-slate-400 mt-1">Saved every single month</div>
+          <div class="mt-6 pt-6 border-t border-slate-800 space-y-3.5">
+            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Standard Frontier Spend:</span><span id="spendWithoutDisplay" class="font-mono font-semibold text-rose-400 line-through">$0.00</span></div>
+            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Spend with Pelid Proxy:</span><span id="spendWithDisplay" class="font-mono font-semibold text-emerald-400">$0.00</span></div>
+            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Estimated Annual Savings:</span><span id="annualSavingsDisplay" class="font-mono font-bold text-white text-sm">$0.00 / yr</span></div>
+            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Cumulative Latency Saved:</span><span id="latencyHoursDisplay" class="font-mono font-semibold text-cyan-400">0 hours</span></div>
+          </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">✓</div>
+            <div class="text-xs text-slate-300"><span class="font-semibold text-white">Self-Hosted $0.00 CPU:</span> Runs on your existing compute with zero GPU overhead.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Unified Architecture -->
+  <section id="architecture" class="py-20 px-6 max-w-5xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-12">
+      <div class="text-cyan-400 font-semibold text-xs tracking-wider uppercase mb-2">Unified Platform</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Two Engines. One Unified Architecture.</h2>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">Pelid accelerates both customer-facing chat traffic and complex coding agent tool loops.</p>
+    </div>
+    <div class="flex justify-center mb-10">
+      <div class="inline-flex p-1.5 rounded-xl bg-slate-900 border border-slate-800">
+        <button onclick="switchTab('gateway')" id="tab-gateway" class="px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition bg-emerald-500 text-slate-950 shadow-md">1. Customer Service Gateway</button>
+        <button onclick="switchTab('tools')" id="tab-tools" class="px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition text-slate-400 hover:text-slate-200">2. Developer Agent Tool Pruning</button>
+      </div>
+    </div>
+    <div id="content-gateway" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-8 rounded-2xl bg-[#111827] border border-slate-800">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Production Ready (v1.1)
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-3">Triage & Local Resolution Gateway</h3>
+        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+          Intercepts conversational requests from chat widgets and user agents. High-confidence routine intents (order tracking, order status, return policies) are resolved instantly via our declarative action engine and cached locally.
+        </p>
+        <ul class="space-y-3 text-xs text-slate-300">
+          <li class="flex items-center gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span><strong class="text-white">Dual Encoders:</strong> Calibrated ModernBERT (EN) & mmBERT (Indic/Manglish).</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span><strong class="text-white">Sub-Millisecond Cache:</strong> &lt;0.05ms exact hash + &lt;0.8ms semantic cache.</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span><strong class="text-white">Declarative Action Engine:</strong> Configured via <code class="text-emerald-300 bg-slate-900 px-1 py-0.5 rounded">pelid.yaml</code> with slot extraction.</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-emerald-400 font-bold">✓</span><span><strong class="text-white">100% Destructive Safety:</strong> Critical actions (refunds, cancellations) always escalate.</span></li>
+        </ul>
+      </div>
+      <div class="p-6 rounded-xl bg-slate-950/70 border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+        <div class="text-slate-500 text-[11px] mb-2">// Architecture Pipeline: Customer Gateway</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-emerald-400">1. Client Request &rarr; X-Pelid-Key Auth (SHA-256)</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-slate-300">2. PII Scrubber & DoS Rate Limiter (&lt;1ms)</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-cyan-400">3. Intent Classifier (ModernBERT / mmBERT: 28ms)</div>
+        <div class="p-2.5 rounded bg-emerald-950/60 border border-emerald-800 text-emerald-300 font-semibold">4A. Path A: Local CRM Action / Cache (&lt;60ms, $0.00)</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-slate-400">4B. Path B: Escalation to GPT-4o / Claude 3.5</div>
+      </div>
+    </div>
+    <div id="content-tools" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-8 rounded-2xl bg-[#111827] border border-cyan-500/30">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-semibold mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Developer Domain (Next Milestone)
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-3">Dynamic Agent Tool Pruner</h3>
+        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+          Coding agents often pass 50–100+ MCP tool schemas in every prompt turn, burning 8,000–15,000 tokens ($0.04/turn). Pelid filters out the 95 irrelevant tools in 12ms before the prompt reaches Claude/GPT-4.
+        </p>
+        <ul class="space-y-3 text-xs text-slate-300">
+          <li class="flex items-center gap-2.5"><span class="text-cyan-400 font-bold">✓</span><span><strong class="text-white">80+ MCP Tools Supported:</strong> Scales effortlessly with large agent toolchains.</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-cyan-400 font-bold">✓</span><span><strong class="text-white">70% Token Reductions:</strong> Drops tool definition bloat from 12k to 1.2k tokens.</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-cyan-400 font-bold">✓</span><span><strong class="text-white">Zero Model Hallucination:</strong> Models stop hallucinating arguments for irrelevant tools.</span></li>
+        </ul>
+      </div>
+      <div class="p-6 rounded-xl bg-slate-950/70 border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+        <div class="text-slate-500 text-[11px] mb-2">// Architecture Pipeline: Dynamic Tool Pruning</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-cyan-400">1. Agent Turn: 85 MCP Tools (14,200 tokens)</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-indigo-400">2. Pelid Fast Semantic Embedder (8ms)</div>
+        <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-emerald-400">3. Prune: Top-5 Most Relevant Tools (1,100 tokens)</div>
+        <div class="p-2.5 rounded bg-emerald-950/60 border border-emerald-800 text-emerald-300 font-semibold">4. Forward to Claude 3.5 Sonnet (-92% Cost!)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simulator -->
+  <section id="simulator" class="py-20 px-6 max-w-5xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-12">
+      <div class="text-indigo-400 font-semibold text-xs tracking-wider uppercase mb-2">Live Gateway Simulator</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Experience Sub-60ms Routing</h2>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">Click sample prompts or enter your own query to inspect how Pelid routes traffic.</p>
+    </div>
+    <div class="p-6 sm:p-8 rounded-2xl bg-[#111827] border border-slate-800 glow-card">
+      <div class="mb-4">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Select a Sample Query or Type Below</label>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button onclick="simulateQuery('Where is my order #9921?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">📦 Where is my order #9921?</button>
+          <button onclick="simulateQuery('Ente order evide?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🌏 Ente order evide? (Manglish)</button>
+          <button onclick="simulateQuery('I want a refund, package damaged')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">🚨 Refund (Destructive)</button>
+          <button onclick="simulateQuery('Write an essay on quantum computing')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">✍️ Essay (Free-form)</button>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="simInput" value="Where is my order #9921?" class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+          <button onclick="runSimulation()" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition">Test Route</button>
+        </div>
+      </div>
+      <div id="simResult" class="mt-6 p-6 rounded-xl bg-slate-950/80 border border-slate-800 font-mono text-xs">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <span class="text-slate-400">ROUTING DECISION:</span>
+          <span id="simBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 font-bold border border-emerald-800">PATH A — LOCAL RESOLUTION</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-b border-slate-800">
+          <div><div class="text-slate-500 text-[11px]">PREDICTED INTENT</div><div id="simIntent" class="text-white font-semibold mt-0.5">order_status</div></div>
+          <div><div class="text-slate-500 text-[11px]">CONFIDENCE</div><div id="simConfidence" class="text-emerald-400 font-semibold mt-0.5">99.4%</div></div>
+          <div><div class="text-slate-500 text-[11px]">LATENCY</div><div id="simLatency" class="text-cyan-400 font-semibold mt-0.5">28 ms</div></div>
+          <div><div class="text-slate-500 text-[11px]">ESTIMATED COST</div><div id="simCost" class="text-emerald-400 font-semibold mt-0.5">$0.0000 (Saved)</div></div>
+        </div>
+        <div class="pt-4">
+          <div class="text-slate-500 text-[11px] mb-1">LOCAL SYNTHESIZED RESPONSE:</div>
+          <div id="simResponse" class="text-slate-200 leading-relaxed bg-slate-900/60 p-3 rounded border border-slate-800/60">
+            "Your Order #9921 (Sony WH-1000XM5) is currently Out for Delivery via BlueDart Express (Expected by 4:00 PM today)."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quickstart -->
+  <section id="quickstart" class="py-20 px-6 max-w-5xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-12">
+      <div class="text-emerald-400 font-semibold text-xs tracking-wider uppercase mb-2">Get Started in 60 Seconds</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Drop-in OpenAI Compatibility</h2>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">Just point your SDK's <code class="text-emerald-400 font-mono">base_url</code> to Pelid. Zero application changes required.</p>
+    </div>
+    <div class="p-6 sm:p-8 rounded-2xl bg-[#111827] border border-slate-800 glow-card">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+        <div class="flex gap-2">
+          <button onclick="showCodeTab('docker')" id="tab-code-docker" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950">Docker Run</button>
+          <button onclick="showCodeTab('python')" id="tab-code-python" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">Python OpenAI SDK</button>
+          <button onclick="showCodeTab('cli')" id="tab-code-cli" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">Pelid CLI</button>
+        </div>
+        <button onclick="copyCurrentCode()" class="text-xs text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5">
+          <span id="copyText">Copy snippet</span>
+        </button>
+      </div>
+      <pre id="snippet-docker" class="font-mono text-xs sm:text-sm text-slate-300 overflow-x-auto leading-relaxed p-2"><code># Run Pelid Enterprise Gateway with automatic multi-tenant auth
+docker run -d \
+  -p 8080:8080 \
+  -e GEMINI_API_KEY="your-gemini-or-openai-key" \
+  -v pelid_data:/app/data \
+  adhish/pelid:latest</code></pre>
+      <pre id="snippet-python" class="hidden font-mono text-xs sm:text-sm text-slate-300 overflow-x-auto leading-relaxed p-2"><code>from openai import OpenAI
+
+# Simply redirect base_url to your local or self-hosted Pelid proxy
+client = OpenAI(
+    base_url="http://localhost:8080/v1",
+    api_key="pelid_live_your_tenant_key"  # Or your X-Pelid-Key
+)
+
+# Intercepted and resolved locally in 28ms for $0.00!
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Where is my order #9921?"}]
+)
+print(response.choices[0].message.content)</code></pre>
+      <pre id="snippet-cli" class="hidden font-mono text-xs sm:text-sm text-slate-300 overflow-x-auto leading-relaxed p-2"><code># 1. Issue a new multi-tenant API key
+pelid key create --tenant "acme_corp" --name "Acme Corp" --rate-limit 120
+
+# 2. Inspect real-time live cost savings
+pelid stats --tenant "acme_corp"
+
+# 3. Start the gateway server
+pelid start --host 0.0.0.0 --port 8080</code></pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 border-t border-slate-800/80 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>&copy; 2026 Pelid Project. Open-Source Enterprise AI Decision Gateway.</div>
+      <div class="flex items-center gap-6">
+        <a href="https://github.com/Adhish-S/PELID" target="_blank" class="hover:text-emerald-400 transition">GitHub</a>
+        <a href="#calculator" class="hover:text-emerald-400 transition">Calculator</a>
+        <a href="#quickstart" class="hover:text-emerald-400 transition">Docs</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    const PRICING = {
+      'gpt-4o': { name: 'GPT-4o', prompt: 2.50 / 1e6, completion: 10.00 / 1e6 },
+      'claude-3-5': { name: 'Claude 3.5 Sonnet', prompt: 3.00 / 1e6, completion: 15.00 / 1e6 },
+      'gpt-4o-mini': { name: 'GPT-4o-mini', prompt: 0.15 / 1e6, completion: 0.60 / 1e6 }
+    };
+    let currentModel = 'gpt-4o';
+
+    function selectModel(modelKey) {
+      currentModel = modelKey;
+      document.querySelectorAll('.model-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500', 'bg-emerald-500/10', 'text-emerald-400');
+        btn.classList.add('border-slate-700', 'bg-slate-800/40', 'text-slate-300');
+      });
+      const activeBtn = document.getElementById('btn-' + modelKey);
+      if (activeBtn) {
+        activeBtn.classList.add('border-emerald-500', 'bg-emerald-500/10', 'text-emerald-400');
+        activeBtn.classList.remove('border-slate-700', 'bg-slate-800/40', 'text-slate-300');
+      }
+      calculateSavings();
+    }
+
+    function calculateSavings() {
+      const requests = parseInt(document.getElementById('requestsInput').value, 10);
+      const tokens = parseInt(document.getElementById('tokensInput').value, 10);
+      const localRate = parseInt(document.getElementById('rateInput').value, 10) / 100.0;
+
+      document.getElementById('requestsDisplay').textContent = requests.toLocaleString() + ' req';
+      document.getElementById('tokensDisplay').textContent = tokens.toLocaleString() + ' tokens';
+      document.getElementById('rateDisplay').textContent = Math.round(localRate * 100) + '% local';
+
+      const model = PRICING[currentModel];
+      const avgCompletionTokens = 75;
+      const costPerReq = (tokens * model.prompt) + (avgCompletionTokens * model.completion);
+      const totalMonthlySpend = requests * costPerReq;
+      const localReqs = requests * localRate;
+      const escalatedReqs = requests * (1 - localRate);
+      const spendWithPelid = escalatedReqs * costPerReq;
+
+      const monthlySavings = totalMonthlySpend - spendWithPelid;
+      const annualSavings = monthlySavings * 12;
+      const latencySavedSeconds = (localReqs * 0.82);
+      const latencyHours = Math.round(latencySavedSeconds / 3600);
+
+      document.getElementById('spendWithoutDisplay').textContent = '$' + totalMonthlySpend.toFixed(2);
+      document.getElementById('spendWithDisplay').textContent = '$' + spendWithPelid.toFixed(2);
+      document.getElementById('monthlySavingsDisplay').textContent = '$' + monthlySavings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('annualSavingsDisplay').textContent = '$' + annualSavings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' / yr';
+      document.getElementById('latencyHoursDisplay').textContent = latencyHours + ' hours';
+    }
+
+    document.getElementById('requestsInput').addEventListener('input', calculateSavings);
+    document.getElementById('tokensInput').addEventListener('input', calculateSavings);
+    document.getElementById('rateInput').addEventListener('input', calculateSavings);
+    calculateSavings();
+
+    function switchTab(tab) {
+      const gatewayTab = document.getElementById('tab-gateway');
+      const toolsTab = document.getElementById('tab-tools');
+      const gatewayContent = document.getElementById('content-gateway');
+      const toolsContent = document.getElementById('content-tools');
+
+      if (tab === 'gateway') {
+        gatewayTab.classList.add('bg-emerald-500', 'text-slate-950', 'shadow-md');
+        gatewayTab.classList.remove('text-slate-400');
+        toolsTab.classList.remove('bg-emerald-500', 'text-slate-950', 'shadow-md');
+        toolsTab.classList.add('text-slate-400');
+        gatewayContent.classList.remove('hidden');
+        toolsContent.classList.add('hidden');
+      } else {
+        toolsTab.classList.add('bg-emerald-500', 'text-slate-950', 'shadow-md');
+        toolsTab.classList.remove('text-slate-400');
+        gatewayTab.classList.remove('bg-emerald-500', 'text-slate-950', 'shadow-md');
+        gatewayTab.classList.add('text-slate-400');
+        toolsContent.classList.remove('hidden');
+        gatewayContent.classList.add('hidden');
+      }
+    }
+
+    function simulateQuery(text) {
+      document.getElementById('simInput').value = text;
+      runSimulation();
+    }
+
+    function runSimulation() {
+      const query = document.getElementById('simInput').value.trim();
+      const badge = document.getElementById('simBadge');
+      const intent = document.getElementById('simIntent');
+      const confidence = document.getElementById('simConfidence');
+      const latency = document.getElementById('simLatency');
+      const cost = document.getElementById('simCost');
+      const response = document.getElementById('simResponse');
+      const qLower = query.toLowerCase();
+
+      if (qLower.includes('order') || qLower.includes('tracking') || qLower.includes('evide')) {
+        badge.textContent = 'PATH A — LOCAL RESOLUTION';
+        badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 font-bold border border-emerald-800';
+        intent.textContent = 'order_status';
+        confidence.textContent = '99.4%';
+        latency.textContent = '28 ms';
+        cost.textContent = '$0.0000 (Saved)';
+        response.textContent = qLower.includes('evide') 
+          ? '"Ningalude Order #9921 (Sony WH-1000XM5) BlueDart vazhi deliveryku erangiyitund. Innu 4:00 PM munpayi labhikkum."'
+          : '"Your Order #9921 (Sony WH-1000XM5) is currently Out for Delivery via BlueDart Express (Expected by 4:00 PM today)."';
+      } else if (qLower.includes('refund') || qLower.includes('cancel')) {
+        badge.textContent = 'PATH B — ESCALATED (SAFETY GUARDRAIL)';
+        badge.className = 'px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-400 font-bold border border-rose-800';
+        intent.textContent = 'refund_request (DESTRUCTIVE)';
+        confidence.textContent = '98.8%';
+        latency.textContent = '740 ms (Upstream)';
+        cost.textContent = '$0.0042 (Frontier)';
+        response.textContent = '"[SAFETY ESCALATION] Destructive financial action detected. Escalated to frontier Claude 3.5 Sonnet with human agent oversight."';
+      } else {
+        badge.textContent = 'PATH B — ESCALATED (FREE-FORM)';
+        badge.className = 'px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-400 font-bold border border-indigo-800';
+        intent.textContent = 'free_form_essay';
+        confidence.textContent = 'N/A';
+        latency.textContent = '920 ms (Upstream)';
+        cost.textContent = '$0.0075 (Frontier)';
+        response.textContent = '"[UPSTREAM FRONTIER MODEL] Intercepted non-triage open-ended reasoning. Transparently proxied to GPT-4o with SSE streaming."';
+      }
+    }
+
+    let activeSnippet = 'docker';
+    function showCodeTab(tab) {
+      activeSnippet = tab;
+      ['docker', 'python', 'cli'].forEach(t => {
+        const btn = document.getElementById('tab-code-' + t);
+        const snippet = document.getElementById('snippet-' + t);
+        if (t === tab) {
+          btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950';
+          snippet.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white';
+          snippet.classList.add('hidden');
+        }
+      });
+    }
+
+    function copyCurrentCode() {
+      const snippet = document.getElementById('snippet-' + activeSnippet).innerText;
+      navigator.clipboard.writeText(snippet).then(() => {
+        const textSpan = document.getElementById('copyText');
+        textSpan.textContent = 'Copied to clipboard!';
+        setTimeout(() => { textSpan.textContent = 'Copy snippet'; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

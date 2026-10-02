@@ -53,6 +53,7 @@ from pelid.db import (
 from pelid.mock_crm import extract_order_id
 from pelid.responder import resolve_path_a_response
 from pelid.security import is_prompt_injection, validate_api_key, anonymize_pii, SlidingWindowRateLimiter
+from pelid.auth import authenticate_request, get_tenant_limiter, reload_key_cache, has_active_tenants
 from pelid.session import synthesize_multi_turn_query
 
 app = FastAPI(
@@ -78,6 +79,7 @@ rate_limiter = SlidingWindowRateLimiter(max_requests_per_minute=RATE_LIMIT_PER_M
 async def startup_event():
     """Warm up database and decision models so requests have sub-50ms response time."""
     init_db()
+    reload_key_cache()
     print("  [Pelid] Pre-warming dual decision engines (English + Multilingual) into memory...")
     from pelid.decision import get_agent, get_metadata, get_onnx_session
     for lang in ("en", "ml"):
@@ -149,10 +151,10 @@ async def prometheus_metrics():
 
 
 @app.get("/api/stats")
-async def get_stats():
+async def get_stats(tenant_id: Optional[str] = None):
     """Returns real-time analytics, cache stats, and recent request logs from SQLite."""
-    summary = get_analytics_summary()
-    recent_logs = get_recent_logs(limit=30)
+    summary = get_analytics_summary(tenant_id=tenant_id)
+    recent_logs = get_recent_logs(limit=30, tenant_id=tenant_id)
     c_stats = get_cache().stats()
     return {
         "summary": summary,
@@ -160,7 +162,7 @@ async def get_stats():
         "cache": c_stats,
         "security": {
             "shield_active": ENABLE_INJECTION_SHIELD,
-            "auth_required": bool(PELID_PROXY_API_KEY),
+            "auth_required": bool(PELID_PROXY_API_KEY) or has_active_tenants(),
             "shadow_mode": SHADOW_MODE,
             "active_domain": get_active_domain(),
         },
@@ -263,6 +265,7 @@ async def stream_upstream_generator(
     language: str,
     reason: str,
     t0: float,
+    tenant_id: str = "default",
 ):
     """Transparently pipe upstream SSE stream chunks from frontier LLM to the client."""
     full_content = []
@@ -283,6 +286,7 @@ async def stream_upstream_generator(
         tokens_completion=50,
         tokens_saved=0,
         reason=reason,
+        tenant_id=tenant_id,
     )
     print(f"  [PATH B - STREAMING] {latency_ms:.0f}ms | Upstream stream completed")
 
@@ -312,14 +316,17 @@ async def chat_completions(request: Request):
     """
     t0 = time.perf_counter()
 
-    # Step 0A: Bearer Token Auth (Security Check)
-    if PELID_PROXY_API_KEY:
-        auth_header = request.headers.get("Authorization")
-        if not validate_api_key(auth_header, PELID_PROXY_API_KEY):
-            return JSONResponse(
-                status_code=401,
-                content={"error": {"message": "Invalid or missing Bearer token for Pelid Proxy", "type": "auth_error"}},
-            )
+    # Step 0A: Multi-Tenant & Scoped API Key Authentication
+    auth_header = request.headers.get("Authorization")
+    pelid_key_header = request.headers.get("X-Pelid-Key")
+    is_auth, tenant, auth_err = authenticate_request(auth_header, pelid_key_header)
+    if not is_auth:
+        return JSONResponse(
+            status_code=401,
+            content={"error": {"message": auth_err, "type": "auth_error"}},
+        )
+
+    tenant_id = tenant.id if tenant else "default"
 
     # Step 0B: Payload Size Check (DoS Prevention)
     raw_body = await request.body()
@@ -329,13 +336,20 @@ async def chat_completions(request: Request):
             content={"error": {"message": f"Payload exceeds limit of {MAX_PAYLOAD_BYTES} bytes", "type": "payload_too_large"}},
         )
 
-    # Step 0C: Sliding-Window Rate Limiting (Abuse & runaway agent loop protection)
-    client_ip = request.client.host if request.client else "127.0.0.1"
-    allowed, retry_after = rate_limiter.is_allowed(client_ip)
+    # Step 0C: Sliding-Window Rate Limiting (Per-Tenant or Per-IP abuse protection)
+    if tenant:
+        t_limiter = get_tenant_limiter(tenant)
+        allowed, retry_after = t_limiter.is_allowed(tenant.id)
+        limit_rpm = tenant.rate_limit_rpm
+    else:
+        client_ip = request.client.host if request.client else "127.0.0.1"
+        allowed, retry_after = rate_limiter.is_allowed(client_ip)
+        limit_rpm = RATE_LIMIT_PER_MINUTE
+
     if not allowed:
         return JSONResponse(
             status_code=429,
-            content={"error": {"message": f"Rate limit exceeded ({RATE_LIMIT_PER_MINUTE} req/min). Retry in {retry_after}s.", "type": "rate_limit_error"}},
+            content={"error": {"message": f"Rate limit exceeded ({limit_rpm} req/min). Retry in {retry_after}s.", "type": "rate_limit_error"}},
             headers={"Retry-After": str(retry_after)},
         )
 
@@ -349,14 +363,15 @@ async def chat_completions(request: Request):
     last_message_content = messages[-1].get("content", "") if messages else ""
     token_count = count_tokens(last_message_content)
 
-    # Step 0C: Prompt Injection Shield
+    # Step 0D: Prompt Injection Shield
     if ENABLE_INJECTION_SHIELD:
         is_inj, inj_reason = is_prompt_injection(last_message_content)
         if is_inj:
             print(f"  [SECURITY SHIELD] Intercepted adversarial prompt: {inj_reason}")
             return await forward_to_upstream(
                 body, request, last_message_content, t0,
-                intent="prompt_injection_blocked", confidence=1.0, language="en", reason="Adversarial / Injection Detected"
+                intent="prompt_injection_blocked", confidence=1.0, language="en", reason="Adversarial / Injection Detected",
+                tenant_id=tenant_id
             )
 
     # Detect language early for cache and routing
@@ -378,6 +393,7 @@ async def chat_completions(request: Request):
             tokens_completion=count_tokens(cached["content"]),
             tokens_saved=cached["tokens_saved"],
             reason="Sub-millisecond Exact Cache Hit",
+            tenant_id=tenant_id,
         )
         print(f"  [CACHE HIT - EXACT] {latency_ms:.2f}ms | Intent: {cached['intent']} | Saved: {cached['tokens_saved']} tok")
 
@@ -409,11 +425,11 @@ async def chat_completions(request: Request):
 
     # Step 3: Call-Type Detection
     if not is_decision_call(body):
-        return await forward_to_upstream(body, request, last_message_content, t0, reason="Free-form generation")
+        return await forward_to_upstream(body, request, last_message_content, t0, reason="Free-form generation", tenant_id=tenant_id)
 
     # Step 4: Context Budget Guardrail
     if not is_within_budget(triage_query):
-        return await forward_to_upstream(body, request, last_message_content, t0, reason="Exceeded context budget")
+        return await forward_to_upstream(body, request, last_message_content, t0, reason="Exceeded context budget", tenant_id=tenant_id)
 
     # Step 5: Run Decision Engine
     result = await run_decision(triage_query, language)
@@ -435,6 +451,7 @@ async def chat_completions(request: Request):
                 tokens_completion=count_tokens(sem_cached["content"]),
                 tokens_saved=sem_cached["tokens_saved"],
                 reason=f"Semantic Cache Hit ({sem_cached['similarity']*100:.0f}%)",
+                tenant_id=tenant_id,
             )
             print(f"  [CACHE HIT - SEMANTIC] {latency_ms:.2f}ms | Sim: {sem_cached['similarity']} | Intent: {sem_cached['intent']}")
 
@@ -465,7 +482,8 @@ async def chat_completions(request: Request):
     if is_shadow:
         return await forward_to_upstream(
             body, request, last_message_content, t0,
-            intent=result.label, confidence=result.confidence, language=language, reason="Shadow Mode Active"
+            intent=result.label, confidence=result.confidence, language=language, reason="Shadow Mode Active",
+            tenant_id=tenant_id
         )
 
     # Step 8: Domain Destructive Overrides
@@ -504,6 +522,7 @@ async def chat_completions(request: Request):
             tokens_completion=completion_tokens,
             tokens_saved=saved_tokens,
             reason="High confidence local resolution",
+            tenant_id=tenant_id,
         )
 
         print(f"  [PATH A - LOCAL] ~{latency_ms:.0f}ms | Intent: {result.label} | Conf: {result.confidence*100:.1f}% | Saved: {saved_tokens} tok")
@@ -547,7 +566,8 @@ async def chat_completions(request: Request):
         reason = "Destructive action" if (result.is_destructive or is_domain_destructive) else "Low confidence"
         return await forward_to_upstream(
             body, request, last_message_content, t0,
-            intent=result.label, confidence=result.confidence, language=language, reason=reason
+            intent=result.label, confidence=result.confidence, language=language, reason=reason,
+            tenant_id=tenant_id
         )
 
 
@@ -560,6 +580,7 @@ async def forward_to_upstream(
     confidence: float = 0.0,
     language: str = "en",
     reason: str = "Upstream fallback",
+    tenant_id: str = "default",
 ) -> Any:
     """Forward request to upstream frontier LLM (supports both streaming and JSON)."""
     url = f"{UPSTREAM_BASE_URL}/chat/completions"
@@ -601,6 +622,7 @@ async def forward_to_upstream(
                 language=language,
                 reason=reason,
                 t0=t0,
+                tenant_id=tenant_id,
             ),
             media_type="text/event-stream",
         )
@@ -662,6 +684,7 @@ async def forward_to_upstream(
         tokens_completion=completion_tokens,
         tokens_saved=0,
         reason=reason,
+        tenant_id=tenant_id,
     )
 
     print(f"  [PATH B - FRONTIER] {latency_ms:.0f}ms | Upstream: {UPSTREAM_MODEL} | Reason: {reason}")

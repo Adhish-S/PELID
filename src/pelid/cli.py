@@ -40,11 +40,13 @@ def cmd_stats(args):
     """Print current telemetry and cache savings statistics."""
     from pelid.db import get_analytics_summary
     from pelid.cache import get_cache
-    summary = get_analytics_summary()
+    tenant = getattr(args, "tenant", None)
+    summary = get_analytics_summary(tenant_id=tenant)
     c_stats = get_cache().stats()
 
     print("=" * 60)
-    print("  Pelid Gateway Live Telemetry Summary")
+    tenant_label = f" (Tenant: {tenant})" if tenant else " (Global All Tenants)"
+    print(f"  Pelid Gateway Live Telemetry Summary{tenant_label}")
     print("=" * 60)
     print(f"  Total Requests:         {summary.get('total_requests', 0)}")
     print(f"  Resolved Locally (A):   {summary.get('path_a_count', 0)} ({summary.get('local_resolution_rate', 0)}%)")
@@ -58,6 +60,54 @@ def cmd_stats(args):
     print(f"  Exact Hash Hits (<0.05ms): {c_stats.get('exact_hits', 0)}")
     print(f"  Semantic Cosine Hits:   {c_stats.get('semantic_hits', 0)}")
     print("=" * 60)
+
+
+def cmd_key_create(args):
+    """Generate and register a new scoped tenant API key."""
+    from pelid.auth import create_tenant
+    raw_key, tenant = create_tenant(
+        tenant_id=args.tenant,
+        name=args.name or args.tenant,
+        rate_limit_rpm=args.rate_limit,
+    )
+    print("=" * 60)
+    print("  [SUCCESS] Created New Scoped Tenant API Key")
+    print("=" * 60)
+    print(f"  Tenant ID:   {tenant.id}")
+    print(f"  Tenant Name: {tenant.name}")
+    print(f"  Rate Limit:  {tenant.rate_limit_rpm} req/min")
+    print(f"  Prefix:      {tenant.key_prefix}")
+    print("-" * 60)
+    print(f"  API KEY:     {raw_key}")
+    print("-" * 60)
+    print("  [IMPORTANT] Store this key securely. Raw key is never stored in DB.")
+    print("  Pass via header: 'X-Pelid-Key: <key>' or 'Authorization: Bearer <key>'")
+    print("=" * 60)
+
+
+def cmd_key_list(args):
+    """List all registered tenants and their API key status."""
+    from pelid.auth import list_tenants
+    tenants = list_tenants()
+    print("=" * 75)
+    print(f"  {'TENANT ID':<18} {'NAME':<20} {'PREFIX':<18} {'RPM':<6} {'STATUS'}")
+    print("=" * 75)
+    if not tenants:
+        print("  (No tenants registered yet. Gateway is running in open development mode.)")
+    for t in tenants:
+        status = "ACTIVE" if t["is_active"] else "REVOKED"
+        print(f"  {t['id']:<18} {t['name'][:18]:<20} {t['key_prefix']:<18} {t['rate_limit_rpm']:<6} {status}")
+    print("=" * 75)
+
+
+def cmd_key_revoke(args):
+    """Revoke a tenant's access key."""
+    from pelid.auth import revoke_tenant
+    success = revoke_tenant(args.tenant)
+    if success:
+        print(f"[OK] Successfully revoked API access for tenant '{args.tenant}'.")
+    else:
+        print(f"[ERROR] Tenant '{args.tenant}' not found in registry.")
 
 
 def cmd_cache_clear(args):
@@ -91,7 +141,28 @@ def main():
 
     # pelid stats
     stats_parser = subparsers.add_parser("stats", help="Display real-time analytics and savings")
+    stats_parser.add_argument("--tenant", default=None, help="Filter analytics by tenant ID")
     stats_parser.set_defaults(func=cmd_stats)
+
+    # pelid key (subcommands: create, list, revoke)
+    key_parser = subparsers.add_parser("key", help="Manage multi-tenant API keys")
+    key_subparsers = key_parser.add_subparsers(dest="key_command", help="Key operations")
+
+    # pelid key create
+    create_key_parser = key_subparsers.add_parser("create", help="Issue a new scoped tenant API key")
+    create_key_parser.add_argument("--tenant", required=True, help="Unique tenant identifier (e.g. acme_corp)")
+    create_key_parser.add_argument("--name", default=None, help="Human-readable company or project name")
+    create_key_parser.add_argument("--rate-limit", type=int, default=60, help="Max requests per minute (default: 60)")
+    create_key_parser.set_defaults(func=cmd_key_create)
+
+    # pelid key list
+    list_key_parser = key_subparsers.add_parser("list", help="List all registered tenant keys")
+    list_key_parser.set_defaults(func=cmd_key_list)
+
+    # pelid key revoke
+    revoke_key_parser = key_subparsers.add_parser("revoke", help="Revoke a tenant API key")
+    revoke_key_parser.add_argument("tenant", help="Tenant ID to revoke")
+    revoke_key_parser.set_defaults(func=cmd_key_revoke)
 
     # pelid clear
     clear_parser = subparsers.add_parser("clear", help="Reset local cache and purge audit database")
