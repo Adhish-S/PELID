@@ -3,12 +3,16 @@ version: '3.8'
 # ─────────────────────────────────────────────────────────────
 # Pelid AI Decision Gateway — Compose Specification
 # 
-# Usage:
-#   GEMINI_API_KEY="your-key" docker compose up -d
+# Services:
+# 1. pelid-gateway: The high-speed ModernBERT / mmBERT decision proxy (Port 8080)
+# 2. caddy-proxy: Production reverse proxy with automatic HTTPS & TLS (Ports 80 & 443)
 # 
-# Security Note:
-#   API keys and credentials are provided at runtime via environment
-#   variables and are NEVER stored inside the container image.
+# Usage:
+#   # Local development (HTTPS on localhost):
+#   docker compose up -d
+# 
+#   # Production deployment with real domain:
+#   PELID_DOMAIN=api.yourcompany.com docker compose up -d
 # ─────────────────────────────────────────────────────────────
 
 services:
@@ -18,6 +22,8 @@ services:
       dockerfile: Dockerfile
     container_name: pelid-gateway
     restart: unless-stopped
+    expose:
+      - "8080"
     ports:
       - "8080:8080"
     environment:
@@ -40,6 +46,26 @@ services:
       retries: 3
       start_period: 25s
 
+  caddy-proxy:
+    image: caddy:2-alpine
+    container_name: pelid-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"     # Standard HTTP (auto-redirects to HTTPS)
+      - "443:443"   # Encrypted HTTPS (TLS)
+    environment:
+      - PELID_DOMAIN=${PELID_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - pelid-gateway
+
 volumes:
   pelid-data:
+    driver: local
+  caddy-data:
+    driver: local
+  caddy-config:
     driver: local

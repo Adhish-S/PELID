@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────
+# Pelid AI Decision Gateway — Caddy Reverse Proxy & TLS Engine
+# 
+# Features:
+# - Automatic HTTPS & TLS certificate generation (ZeroSSL / Let's Encrypt)
+# - HTTP to HTTPS automatic redirection
+# - Header hardening (HSTS, Anti-Clickjacking, MIME-sniff protection)
+# - High-performance Gzip and Zstandard compression
+# - Proxy pass-through to Pelid Gateway on port 8080
+# ─────────────────────────────────────────────────────────────
+
+{
+    admin off
+}
+
+# If PELID_DOMAIN is set (e.g. api.yourcompany.com), Caddy provisions a trusted public certificate.
+# If left as default (localhost), it provisions an internal self-signed development certificate.
+{$PELID_DOMAIN:localhost} {
+    # 1. Reverse proxy to the Pelid Gateway container
+    reverse_proxy pelid-gateway:8080 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Backend health checks
+        health_uri /healthz
+        health_interval 15s
+        health_timeout 5s
+    }
+
+    # 2. Production Security Headers
+    header {
+        # Strict Transport Security (HSTS - 1 year)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # Frame protection against clickjacking
+        X-Frame-Options "DENY"
+        # Cross-Site Scripting protection
+        X-XSS-Protection "1; mode=block"
+        # Referrer privacy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Hide reverse proxy server details
+        -Server
+    }
+
+    # 3. Transparent Response Compression
+    encode gzip zstd
+}
