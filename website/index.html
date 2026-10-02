@@ -548,7 +548,30 @@ pelid start --host 0.0.0.0 --port 8080</code></pre>
 
       const orderRef = slots.order_id ? `#${slots.order_id}` : (lang === 'ml' ? 'Order #9921' : 'Order #9921');
 
-      // Intent classification rules matching pelid.yaml
+      // 1. Priority 1 — Greetings & Chit-chat (<1ms, Path A, $0.00)
+      const greetingRegex = /^(?:hi+|hello+|hey+|hai+|hlo+|halo)[\s.!?]*$/i;
+      const salutationRegex = /^(?:good\s+(?:morning|afternoon|evening)|namaskaram|namaste)[\s.!?]*$/i;
+      const greetTeamRegex = /^(?:hi+|hello+|hey+|hai+)\s+(?:team|all|there|sir|support|bro|assist|pelid)[\s.!?]*$/i;
+      if (greetingRegex.test(qLower) || salutationRegex.test(qLower) || greetTeamRegex.test(qLower) || ['hi', 'hello', 'hey', 'namaskaram', 'namaste'].includes(qLower)) {
+        const respText = lang === 'ml'
+          ? "Namaskaram! Customer Support-il ninnum engane sahayikkanam? Orders, delivery, returns sambhavikkan enthelum undo?"
+          : lang === 'hi'
+          ? "Namaste! Customer Support mein aapka swagat hai. Aaj hum aapki kya sahayata kar sakte hain?"
+          : "Hello! Welcome to Pelid Customer Support. How can I assist you with your orders, deliveries, or account today?";
+        return {
+          intent: 'general_chitchat_or_faq',
+          language: lang,
+          confidence: 100.0,
+          path: 'A',
+          latency_ms: 3,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      // 2. Priority 2 — Destructive Safety Guardrails
       if (qLower.includes('cancel') || qLower.includes('radd')) {
         return {
           intent: 'cancel_order',
@@ -577,6 +600,34 @@ pelid start --host 0.0.0.0 --port 8080</code></pre>
         };
       }
 
+      // 3. Priority 3 — Defect & Damage Dominance Rule (Overrides package/order delivery words)
+      const defectTerms = [
+        'cracked', 'crack', 'pottiyath', 'pottiya', 'pottipoyi', 'potti',
+        'toota', 'phoota', 'damaged', 'broken', 'shattered', 'defective',
+        'keeri', 'keeripoyi', 'odinja', 'odinjirikkunnu', 'sathanam cracked',
+        'screen cracked', 'screen damaged', 'display broken', 'seal khula',
+        'faulty', 'tampered'
+      ];
+      if (defectTerms.some(term => qLower.includes(term))) {
+        const respText = lang === 'ml'
+          ? `Item damaged/cracked aayi vannathil khedikkunnu. Dayavayi ${orderRef}-nte photo 'Returns' portal-il upload cheythal udan free replacement dispatch cheyyam.`
+          : lang === 'hi'
+          ? `Damaged ya toota hua item aane ke liye humein khed hai. Kripya ${orderRef} ki photo return section mein upload karein, hum turant replacement bhej denge.`
+          : `We sincerely apologize that your item arrived damaged/cracked in ${orderRef}. We have authorized an instant free replacement dispatch.`;
+        return {
+          intent: 'wrong_or_defective_item',
+          language: lang,
+          confidence: 99.8,
+          path: 'A',
+          latency_ms: 22,
+          cost_saved: '$0.0000 (Saved)',
+          is_destructive: false,
+          slots: slots,
+          response: respText
+        };
+      }
+
+      // 4. Delayed or Missing Shipments
       if (qLower.includes('delay') || qLower.includes('late') || qLower.includes('missing') || qLower.includes('not arrived') || qLower.includes('not delivered') || qLower.includes('stuck') || qLower.includes('kab milega')) {
         const respText = lang === 'ml'
           ? `Ningalude delayed package (${orderRef}) BlueDart vazhi expedite cheythittund. Puthukkiya ETA: Innu 5:30 PM munpayi.`
@@ -589,25 +640,6 @@ pelid start --host 0.0.0.0 --port 8080</code></pre>
           confidence: 98.2,
           path: 'A',
           latency_ms: 27,
-          cost_saved: '$0.0000 (Saved)',
-          is_destructive: false,
-          slots: slots,
-          response: respText
-        };
-      }
-
-      if (qLower.includes('broken') || qLower.includes('damaged') || qLower.includes('defective') || qLower.includes('wrong') || qLower.includes('toota') || qLower.includes('pottiya') || qLower.includes('shattered')) {
-        const respText = lang === 'ml'
-          ? `Item damaged aayi vannathil kshamikkunnu. Dayavayi ${orderRef}-nte photo 'Returns' portal-il upload cheythal udan replacement dispatch cheyyam.`
-          : lang === 'hi'
-          ? `Damage package ke liye humein khed hai. Kripya ${orderRef} ki photo return section mein upload karein, hum turant replacement bhej denge.`
-          : `We sincerely apologize for the damaged item in ${orderRef}. We have approved an instant replacement dispatch via courier.`;
-        return {
-          intent: 'wrong_or_defective_item',
-          language: lang,
-          confidence: 97.9,
-          path: 'A',
-          latency_ms: 31,
           cost_saved: '$0.0000 (Saved)',
           is_destructive: false,
           slots: slots,

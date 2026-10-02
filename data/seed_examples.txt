@@ -165,3 +165,14 @@ shipping_address_change | I entered wrong address by mistake, change to my home 
 shipping_address_change | Dispatch se pehle delivery location badal do please
 shipping_address_change | Order #8801 ka shipping address update kardo
 shipping_address_change | Delivery location maattanam, order already placed
+
+# ─── Robust Held-Out Compound Evaluation Set ───
+wrong_or_defective_item | enikk inn morning aan package vannath. appo njan ath thorann nookiyappo sathanam cracked aan
+wrong_or_defective_item | package arrived this morning and when i opened it the item was cracked
+wrong_or_defective_item | vannu package pakshe thorannappo pottiyatha
+wrong_or_defective_item | box intact tha par display cracked tha
+general_chitchat_or_faq | HI...
+general_chitchat_or_faq | Hello support team
+general_chitchat_or_faq | Namaskaram assistance undo?
+cancel_order | enikk ee order venda cancel aakkanam urgent aan
+refund_request | damaged product delivery kitti cash refund venam

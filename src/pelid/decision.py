@@ -12,7 +12,9 @@ Routing Rules:
 """
 
 import json
+import re
 from pathlib import Path
+from typing import Optional
 import numpy as np
 import torch
 import laya
@@ -129,6 +131,96 @@ class DecisionResult:
         return self.is_confident
 
 
+def fast_path_pre_router(text: str, language: str = "en") -> Optional[DecisionResult]:
+    """
+    Sub-millisecond micro-heuristic pre-router for high-precision boundaries.
+    Prevents rookie errors like escalating 'HI...' or misrouting compound defect queries.
+    """
+    q = text.strip()
+    q_lower = q.lower()
+
+    # 1. Greetings & Chit-chat (<1ms, Path A, $0.00)
+    # Catches 'HI...', 'Hi!', 'Hello', 'Hey', 'Good morning', 'Namaskaram', 'Namaste', etc.
+    greeting_patterns = [
+        r"^(?:hi+|hello+|hey+|hai+|hlo+|halo)\b[\s.!?]*$",
+        r"^(?:good\s+(?:morning|afternoon|evening)|namaskaram|namaste)\b[\s.!?]*$",
+        r"^(?:hi+|hello+|hey+|hai+)\s+(?:team|all|there|sir|support|bro|assist|pelid)[\s.!?]*$",
+    ]
+    for pat in greeting_patterns:
+        if re.search(pat, q_lower):
+            return DecisionResult(
+                label="general_chitchat_or_faq",
+                confidence=1.0,
+                query_text=text,
+            )
+
+    # 2. Destructive Guardrails (Cancellations & Refunds) - Overrides delivery words
+    cancel_patterns = [
+        r"\b(?:cancel\s*(?:my\s*)?order|order\s*cancel|radd\s*kardo|order\s*radd|cancel\s*aakkanam|cancel\s*cheyyu|stop\s*dispatch)\b",
+        r"\b(?:cancel\s*(?:my\s*)?subscription|stop\s*auto\s*(?:pay|renewal|debit)|cancel\s*membership)\b",
+        r"\b(?:delete\s*(?:my\s*)?account|close\s*(?:my\s*)?account|erase\s*(?:all\s*)?data)\b",
+    ]
+    for pat in cancel_patterns:
+        if re.search(pat, q_lower):
+            lbl = "cancel_subscription" if "sub" in pat or "membership" in q_lower or "auto" in q_lower else ("delete_account" if "account" in q_lower else "cancel_order")
+            return DecisionResult(
+                label=lbl,
+                confidence=0.999,
+                query_text=text,
+            )
+
+    if re.search(r"\b(?:refund|money\s*back|paisa\s*wapas|cash\s*(?:thirike|refund))\b", q_lower):
+        return DecisionResult(
+            label="refund_request",
+            confidence=0.999,
+            query_text=text,
+        )
+
+    # 3. Defect & Damage Dominance Rule
+    # Even if query mentions 'package arrived this morning' or 'order #9921',
+    # the presence of defect/damage terms makes the core intent wrong_or_defective_item!
+    defect_terms = [
+        "cracked", "crack", "pottiyath", "pottiya", "pottipoyi", "potti",
+        "toota", "phoota", "damaged", "broken", "shattered", "defective",
+        "keeri", "keeripoyi", "odinja", "odinjirikkunnu", "sathanam cracked",
+        "screen cracked", "screen damaged", "display broken", "seal khula",
+        "faulty", "tampered"
+    ]
+    if any(term in q_lower for term in defect_terms):
+        return DecisionResult(
+            label="wrong_or_defective_item",
+            confidence=0.998,
+            query_text=text,
+        )
+
+    # 4. Explicit GST / Invoice Download (without dispute/refund)
+    if re.search(r"\b(?:gst\s*invoice|tax\s*invoice|download\s*bill|bill\s*copy|invoice\s*copy)\b", q_lower):
+        if not any(w in q_lower for w in ["refund", "wrong", "extra", "dispute", "cancel"]):
+            return DecisionResult(
+                label="invoice_or_receipt",
+                confidence=0.995,
+                query_text=text,
+            )
+
+    # 5. Explicit Login / OTP / Password
+    if re.search(r"\b(?:otp\s*(?:nahi|not|varnnilla|vannilla|delay)|password\s*reset|forgot\s*password|account\s*locked)\b", q_lower):
+        return DecisionResult(
+            label="login_or_password_issue",
+            confidence=0.995,
+            query_text=text,
+        )
+
+    # 6. Explicit Human Agent Escalation
+    if re.search(r"\b(?:connect\s*(?:me\s*)?to\s*(?:a\s*)?(?:human|agent|person|executive)|speak\s*(?:with|to)\s*(?:a\s*)?human|manager\s*se\s*baat|agent-ine\s*connect)\b", q_lower):
+        return DecisionResult(
+            label="complaint_or_escalate_to_human",
+            confidence=0.995,
+            query_text=text,
+        )
+
+    return None
+
+
 async def run_decision(text: str, language: str = "en") -> DecisionResult:
     """
     Run Laya inference on the input text using the appropriate language head.
@@ -142,6 +234,11 @@ async def run_decision(text: str, language: str = "en") -> DecisionResult:
     """
     if not text or not text.strip():
         return DecisionResult(label="other_unclear", confidence=0.0)
+
+    # 0. Deterministic Fast-Path Pre-Router (<1ms)
+    fast_result = fast_path_pre_router(text, language)
+    if fast_result is not None:
+        return fast_result
 
     # 1. Select language-appropriate backbone and head
     agent = get_agent(language)
