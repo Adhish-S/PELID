@@ -14,11 +14,66 @@ Features:
 import os
 import re
 import time
+import urllib.parse
+import ipaddress
 from typing import Any, Dict, Optional
 import httpx
 
 from pelid.domain import load_domain_config, get_active_domain
 from pelid.mock_crm import lookup_order as mock_lookup_order
+
+
+def is_safe_webhook_url(url: str) -> tuple[bool, str]:
+    """
+    Enterprise SSRF Guardrail.
+    Blocks requests to loopback, link-local, cloud metadata, and private IP spaces
+    unless explicitly enabled via PELID_ALLOW_LOCAL_WEBHOOKS=true.
+    """
+    allow_local = os.getenv("PELID_ALLOW_LOCAL_WEBHOOKS", "false").lower() in ("true", "1", "yes")
+    try:
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return False, f"Unsupported scheme '{parsed.scheme}'. Only http/https allowed."
+
+        hostname = parsed.hostname
+        if not hostname:
+            return False, "Invalid URL: missing hostname"
+
+        # Cloud metadata protection
+        if hostname.lower() in ("169.254.169.254", "metadata.google.internal", "instance-data"):
+            return False, "Blocked: Cloud metadata IP detected (SSRF prevention)"
+
+        if allow_local:
+            return True, "Allowed (local dev mode enabled)"
+
+        # Check IP address resolution if hostname is an IP
+        try:
+            ip = ipaddress.ip_address(hostname)
+            if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved:
+                return False, f"Blocked: Target IP '{hostname}' is non-routable/private (SSRF prevention)"
+        except ValueError:
+            # Hostname is a domain name
+            if hostname.lower() in ("localhost", "127.0.0.1", "0.0.0.0", "::1"):
+                return False, "Blocked: Localhost loopback detected (SSRF prevention)"
+
+        return True, "Safe URL"
+    except Exception as e:
+        return False, f"URL parse failure: {e}"
+
+
+def flatten_nested_dict(d: dict, parent_key: str = "", sep: str = ".") -> dict:
+    """Recursively flatten nested dictionary to dot notation (e.g. data.order.status)."""
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else str(k)
+        if isinstance(v, dict):
+            items.extend(flatten_nested_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+            # Also maintain leaf keys for convenience if not already present
+            if parent_key and k not in [item[0] for item in items]:
+                items.append((k, v))
+    return dict(items)
 
 
 class DeclarativeActionEngine:
@@ -60,6 +115,7 @@ class DeclarativeActionEngine:
         slots: Dict[str, Any],
         language: str = "en",
         domain_name: Optional[str] = None,
+        session_id: str = "",
     ) -> Optional[str]:
         """
         Execute the action for the given intent and return the formatted response message.
@@ -69,6 +125,7 @@ class DeclarativeActionEngine:
             slots: Extracted parameter dictionary (e.g. {'order_id': '9921'})
             language: 'en', 'hi', or 'ml'
             domain_name: Optional active domain override
+            session_id: Optional conversation session ID for multi-turn state tracking
 
         Returns:
             Rendered string response, or None if no action declared for intent.
@@ -83,6 +140,14 @@ class DeclarativeActionEngine:
         # 1. Check if required slots are present
         missing_slots = [s for s in required_slots if s not in slots or not slots[s]]
         if missing_slots:
+            # Register in session state machine for next turn resolution
+            if session_id:
+                try:
+                    from pelid.session import record_pending_dialogue
+                    record_pending_dialogue(session_id, intent, missing_slots, language)
+                except Exception:
+                    pass
+
             # Prompt the user for the missing slot in their exact language
             prompt_templates = intent_cfg.get("prompt_for_slots", {})
             if language in prompt_templates:
@@ -97,12 +162,12 @@ class DeclarativeActionEngine:
         if action_type == "http":
             live_data = await self._execute_http_action(action_spec, slots)
             if live_data:
-                context_data.update(live_data)
+                context_data.update(flatten_nested_dict(live_data))
             elif action_spec.get("fallback_to_mock", True):
                 # Fallback to local mock if remote API fails or times out
                 mock_data = self._execute_mock_action(intent, slots)
                 if mock_data:
-                    context_data.update(mock_data)
+                    context_data.update(flatten_nested_dict(mock_data))
                 else:
                     return self._render_not_found(intent_cfg, slots, language)
             else:
@@ -111,7 +176,7 @@ class DeclarativeActionEngine:
         elif action_type == "mock":
             mock_data = self._execute_mock_action(intent, slots)
             if mock_data:
-                context_data.update(mock_data)
+                context_data.update(flatten_nested_dict(mock_data))
             else:
                 return self._render_not_found(intent_cfg, slots, language)
 
@@ -119,7 +184,7 @@ class DeclarativeActionEngine:
         return self._render_template(templates, context_data, language)
 
     async def _execute_http_action(self, action_spec: Dict[str, Any], slots: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Execute external REST API request with dynamic slot interpolation and strict latency timeout."""
+        """Execute external REST API request with SSRF guardrails, slot interpolation, and strict timeout."""
         raw_url = action_spec.get("url", "")
         method = action_spec.get("method", "GET").upper()
         timeout_ms = action_spec.get("timeout_ms", 250)
@@ -128,7 +193,13 @@ class DeclarativeActionEngine:
         # Interpolate slots into URL: e.g. https://api.store.com/orders/{order_id}
         url = raw_url
         for k, v in slots.items():
-            url = url.replace(f"{{{k}}}", str(v))
+            url = url.replace(f"{{{k}}}", urllib.parse.quote(str(v)))
+
+        # SSRF Security Guardrail Check
+        is_safe, ssrf_reason = is_safe_webhook_url(url)
+        if not is_safe:
+            print(f"  [SECURITY SHIELD] Blocked unsafe action URL: {url} ({ssrf_reason})")
+            return None
 
         # Interpolate headers
         headers = {}

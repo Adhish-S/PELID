@@ -232,7 +232,9 @@ data/*.sqlite
 .env
 .env.*
 !.env.example
-static/
+!static/
+!static/*.html
+
 
 
 

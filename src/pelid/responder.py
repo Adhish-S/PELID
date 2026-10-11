@@ -190,6 +190,7 @@ async def resolve_path_a_response(
     query: str,
     intent: str,
     language: str = "en",
+    session_id: str = "",
 ) -> str:
     """
     Entry point for generating the final assistant message for Path A.
@@ -204,7 +205,7 @@ async def resolve_path_a_response(
 
         # 2. Asynchronous Declarative Action Execution (REST API / Webhook)
         action_engine = get_action_engine()
-        rendered_action = await action_engine.execute_action(intent, slots, language)
+        rendered_action = await action_engine.execute_action(intent, slots, language, session_id=session_id)
         if rendered_action:
             return rendered_action
 

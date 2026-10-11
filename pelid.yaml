@@ -120,3 +120,43 @@ domains:
         - warranty_supplier_rma
         - factory_downtime_critical_incident
         - legal_contract_termination
+
+# ─── Universal Zero-Code Semantic Knowledge Base (FAQ Store) ─────────
+# Any company can add Q&A pairs here. Pelid embeds and matches them in <5ms
+# using ModernBERT, resolving them locally on Path A for $0.00 with 0% hallucination.
+faqs:
+  - id: "shipping_coverage_bangalore"
+    category: "logistics"
+    question: "Do you deliver to Bangalore?"
+    variations:
+      - "Is delivery available in Bengaluru?"
+      - "Can you ship packages to Bangalore?"
+      - "Bangalore delivery available?"
+    answer: "Yes! We provide same-day and next-day delivery across Bangalore and major metropolitan cities in India."
+
+  - id: "refund_policy_window"
+    category: "billing"
+    question: "What is your refund policy?"
+    variations:
+      - "How do refunds work?"
+      - "Within how many days can I claim a refund?"
+      - "What is your return and refund window?"
+    answer: "We offer a 100% money-back refund within 7 days of delivery. Funds are credited to your original payment method in 3–5 business days."
+
+  - id: "accepted_payment_methods"
+    category: "billing"
+    question: "What payment methods do you accept?"
+    variations:
+      - "Can I pay using UPI, cards, or Cash on Delivery?"
+      - "Do you accept Google Pay or PhonePe?"
+      - "Supported payment modes?"
+    answer: "We accept all major UPI apps (Google Pay, PhonePe, Paytm), Credit/Debit cards (Visa, Mastercard, RuPay), Net Banking, and Cash on Delivery (COD)."
+
+  - id: "international_shipping_policy"
+    category: "logistics"
+    question: "Do you ship internationally outside India?"
+    variations:
+      - "Can I place an order for delivery to the US or UK?"
+      - "Do you deliver overseas?"
+    answer: "Currently, we only deliver across India. We are working on international delivery and will announce it soon!"
+

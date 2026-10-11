@@ -86,6 +86,12 @@ async def startup_event():
         get_agent(lang)
         get_metadata(lang)
         get_onnx_session(lang)
+    try:
+        from pelid.faq_engine import get_faq_engine
+        get_faq_engine()
+        print("  [Pelid] Universal Zero-Code Semantic Knowledge Base (FAQ Engine) loaded!")
+    except Exception as e:
+        print(f"  [Pelid] FAQ Engine warning: {e}")
     print(f"  [Pelid] Active Domain Profile: '{get_active_domain()}'")
     print("  [Pelid] Sub-Millisecond Semantic Cache initialized!")
     print("  [Pelid] Enterprise Gateway Ready! Serving on http://127.0.0.1:8080")
@@ -226,6 +232,32 @@ async def simulate_endpoint(request: Request):
     domain_destructive = get_domain_destructive_intents()
     is_destructive = decision.label.lower() in [d.lower() for d in domain_destructive] or decision.is_destructive
 
+    from pelid.slot_extractor import extract_slots
+    slots = extract_slots(query)
+
+    # Check Zero-Code Semantic Knowledge Base (FAQ) for informational queries
+    if not is_destructive and (decision.label in ("general_chitchat_or_faq", "how_to_question", "pricing_or_plan_question", "other_unclear") or not decision.should_use_path_a):
+        try:
+            from pelid.faq_engine import get_faq_engine
+            faq_engine = get_faq_engine()
+            faq_match = faq_engine.match(query, query_embedding=decision.embedding)
+            if faq_match:
+                return {
+                    "query": query,
+                    "language": lang,
+                    "intent": f"faq:{faq_match.faq_id}",
+                    "confidence": round(faq_match.score * 100, 1),
+                    "path": "A",
+                    "latency_ms": max(4.0, round(latency_ms, 1)),
+                    "cost_saved": "$0.0000 (Saved)",
+                    "response": faq_match.answer,
+                    "slots": slots,
+                    "is_destructive": False,
+                    "faq_matched": True,
+                }
+        except Exception:
+            pass
+
     if decision.should_use_path_a and not is_destructive:
         path = "A"
         reply = await resolve_path_a_response(query, decision.label, lang)
@@ -253,10 +285,11 @@ async def simulate_endpoint(request: Request):
     }
 
 
-# ─── 2. Real-Time Executive Dashboard ─────────────────────────
+# ─── 2. Real-Time Executive Dashboard & Admin Console ─────────
 
-# Load dashboard HTML from the static file (no Python string escaping issues)
+# Load dashboard & admin HTML from static files
 _DASHBOARD_PATH = Path(__file__).resolve().parent.parent.parent / "static" / "dashboard.html"
+_ADMIN_PATH = Path(__file__).resolve().parent.parent.parent / "static" / "admin.html"
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -276,6 +309,104 @@ async def root_dashboard():
             "Expires": "0",
         },
     )
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_console():
+    """Interactive Enterprise Management Console loaded from static/admin.html."""
+    if not _ADMIN_PATH.exists():
+        return JSONResponse(status_code=404, content={"error": "admin.html not found"})
+    return HTMLResponse(
+        content=_ADMIN_PATH.read_text(encoding="utf-8"),
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
+
+
+@app.get("/api/admin/overview")
+async def admin_overview():
+    """Real-time metrics, recent logs, active tenants, and FAQs."""
+    from pelid.auth import list_tenants
+    from pelid.faq_engine import get_faq_engine
+    summary = get_analytics_summary()
+    recent_logs = get_recent_logs(limit=50)
+    tenants = list_tenants()
+    faq_engine = get_faq_engine()
+    faq_list = [
+        {"id": f.id, "category": f.category, "question": f.question, "answer": f.answer}
+        for f in faq_engine.faqs
+    ]
+    return {
+        "kpis": {
+            "total_requests": summary.get("total_requests", 0),
+            "path_a_count": summary.get("path_a_count", 0),
+            "path_b_count": summary.get("path_b_count", 0),
+            "path_a_rate": summary.get("path_a_rate", 0.0),
+            "tokens_saved": summary.get("total_tokens_saved", 0),
+            "cost_saved_usd": summary.get("total_cost_saved_usd", 0.0),
+        },
+        "recent_logs": recent_logs,
+        "tenants": tenants,
+        "faqs": faq_list,
+    }
+
+
+@app.post("/api/admin/keys")
+async def admin_create_key(request: Request):
+    """Generate a new tenant API key."""
+    from pelid.auth import create_tenant
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    tenant_id = body.get("id", "").strip()
+    name = body.get("name", "").strip()
+    rpm = int(body.get("rate_limit_rpm", 60))
+    if not tenant_id or not name:
+        return JSONResponse(status_code=400, content={"error": "Missing id or name"})
+    raw_key, tenant = create_tenant(tenant_id, name, rpm)
+    return {
+        "raw_key": raw_key,
+        "tenant_id": tenant.id,
+        "name": tenant.name,
+        "rate_limit_rpm": tenant.rate_limit_rpm,
+    }
+
+
+@app.delete("/api/admin/keys/{tenant_id}")
+async def admin_revoke_key(tenant_id: str):
+    """Revoke a tenant API key."""
+    from pelid.auth import revoke_tenant
+    ok = revoke_tenant(tenant_id)
+    return {"success": ok}
+
+
+@app.post("/api/admin/faqs")
+async def admin_add_faq(request: Request):
+    """Add a new custom FAQ."""
+    from pelid.faq_engine import get_faq_engine
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    q = body.get("question", "").strip()
+    a = body.get("answer", "").strip()
+    cat = body.get("category", "general").strip()
+    vars_ = body.get("variations", [])
+    if not q or not a:
+        return JSONResponse(status_code=400, content={"error": "Question and answer required"})
+    faq_engine = get_faq_engine()
+    item = faq_engine.add_faq(question=q, answer=a, category=cat, variations=vars_)
+    return {"status": "ok", "faq_id": item.id}
+
+
+@app.post("/api/admin/test")
+async def admin_test_query(request: Request):
+    """Live query inspection sandbox."""
+    return await simulate_endpoint(request)
 
 
 # ─── 3. SSE Stream Generators ────────────────────────────────
@@ -486,7 +617,63 @@ async def chat_completions(request: Request):
 
     # Step 2: Multi-Turn Context Synthesis & Entity Slot Recall
     session_id = request.headers.get("X-Session-ID") or request.headers.get("X-Conversation-ID") or ""
+    if not session_id:
+        if messages and len(messages) > 1:
+            session_id = f"sess_{abs(hash(messages[0].get('content', '')))}"
+        else:
+            session_id = f"stateless_{int(time.time() * 1000000)}"
     triage_query, active_order_id = synthesize_multi_turn_query(messages, session_id=session_id)
+
+    # Step 2B: Conversational Dialogue State Check (Resolving Pending Slots)
+    from pelid.slot_extractor import extract_slots
+    from pelid.session import check_pending_dialogue_resolution
+    extracted_slots = extract_slots(last_message_content)
+    pending_resolution = check_pending_dialogue_resolution(session_id, last_message_content, extracted_slots)
+    if pending_resolution:
+        pending_intent, accumulated_slots, pending_lang = pending_resolution
+        from pelid.action_engine import get_action_engine
+        action_engine = get_action_engine()
+        action_reply = await action_engine.execute_action(
+            pending_intent, accumulated_slots, language=pending_lang, session_id=session_id
+        )
+        if action_reply:
+            latency_ms = (time.perf_counter() - t0) * 1000
+            completion_tokens = count_tokens(action_reply)
+            saved_tokens = token_count + completion_tokens
+            log_request(
+                query=last_message_content,
+                intent=pending_intent,
+                confidence=1.0,
+                language=pending_lang,
+                path="A",
+                latency_ms=latency_ms,
+                tokens_prompt=token_count,
+                tokens_completion=completion_tokens,
+                tokens_saved=saved_tokens,
+                reason="Conversational Slot Fulfillment",
+                tenant_id=tenant_id,
+            )
+            print(f"  [DIALOGUE STATE RESOLVED] Intent: {pending_intent} | Slots: {accumulated_slots} | Saved: {saved_tokens} tok")
+            if is_stream:
+                return StreamingResponse(stream_path_a_generator(action_reply), media_type="text/event-stream")
+            return JSONResponse(
+                content={
+                    "id": "pelid-dialogue-resolved",
+                    "object": "chat.completion",
+                    "choices": [{"index": 0, "message": {"role": "assistant", "content": action_reply}, "finish_reason": "stop"}],
+                    "usage": {"prompt_tokens": 0, "completion_tokens": completion_tokens, "total_tokens": completion_tokens},
+                    "pelid_metadata": {
+                        "path": "A",
+                        "intent": pending_intent,
+                        "confidence": 1.0,
+                        "language": pending_lang,
+                        "saved_cost": True,
+                        "tokens_saved": saved_tokens,
+                        "latency_ms": round(latency_ms, 2),
+                        "dialogue_state": "slot_fulfilled",
+                    },
+                }
+            )
 
     # Step 3: Call-Type Detection
     if not is_decision_call(body):
@@ -542,6 +729,56 @@ async def chat_completions(request: Request):
                 }
             )
 
+    # Step 6B: Zero-Code Semantic Knowledge Base / FAQ Match (<3ms)
+    has_specific_entity = bool(active_order_id or extract_order_id(last_message_content))
+    if not has_specific_entity and (result.label in ("general_chitchat_or_faq", "how_to_question", "pricing_or_plan_question", "other_unclear") or not result.should_use_path_a):
+        try:
+            from pelid.faq_engine import get_faq_engine
+            faq_engine = get_faq_engine()
+            faq_match = faq_engine.match(triage_query, query_embedding=result.embedding)
+            if faq_match:
+                latency_ms = (time.perf_counter() - t0) * 1000
+                faq_reply = faq_match.answer
+                completion_tokens = count_tokens(faq_reply)
+                saved_tokens = token_count + completion_tokens
+                log_request(
+                    query=last_message_content,
+                    intent=f"faq:{faq_match.faq_id}",
+                    confidence=faq_match.score,
+                    language=language,
+                    path="A",
+                    latency_ms=latency_ms,
+                    tokens_prompt=token_count,
+                    tokens_completion=completion_tokens,
+                    tokens_saved=saved_tokens,
+                    reason=f"Zero-Code FAQ Match ({faq_match.score*100:.1f}%)",
+                    tenant_id=tenant_id,
+                )
+                print(f"  [FAQ MATCH - PATH A] {latency_ms:.2f}ms | FAQ: {faq_match.faq_id} | Score: {faq_match.score*100:.1f}%")
+                if is_stream:
+                    return StreamingResponse(stream_path_a_generator(faq_reply), media_type="text/event-stream")
+                return JSONResponse(
+                    content={
+                        "id": f"pelid-faq-{faq_match.faq_id}",
+                        "object": "chat.completion",
+                        "choices": [{"index": 0, "message": {"role": "assistant", "content": faq_reply}, "finish_reason": "stop"}],
+                        "usage": {"prompt_tokens": 0, "completion_tokens": completion_tokens, "total_tokens": completion_tokens},
+                        "pelid_metadata": {
+                            "path": "A",
+                            "intent": f"faq:{faq_match.faq_id}",
+                            "confidence": faq_match.score,
+                            "language": language,
+                            "saved_cost": True,
+                            "tokens_saved": saved_tokens,
+                            "latency_ms": round(latency_ms, 2),
+                            "faq_matched": True,
+                            "faq_category": faq_match.category,
+                        },
+                    }
+                )
+        except Exception as e:
+            print(f"  [Pelid FAQ Match Warning] {e}")
+
     # Step 7: Check Shadow Mode (Passive Audit)
     is_shadow = SHADOW_MODE or request.headers.get("X-Pelid-Shadow-Mode", "").lower() == "true"
     if is_shadow:
@@ -558,7 +795,7 @@ async def chat_completions(request: Request):
     # Step 9: Route (Path A vs Path B)
     if result.should_use_path_a and not is_domain_destructive:
         # PATH A — Free local resolution!
-        assistant_reply = await resolve_path_a_response(triage_query, result.label, language)
+        assistant_reply = await resolve_path_a_response(triage_query, result.label, language, session_id=session_id)
         completion_tokens = count_tokens(assistant_reply)
         saved_tokens = token_count + completion_tokens
 

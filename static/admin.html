@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Pelid — Enterprise Admin Console</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #0f172a;
+            --surface-card: #141e33;
+            --border: #1e293b;
+            --border-hover: #334155;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --purple: #c084fc;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            font-size: 14px;
+        }
+        .container { max-width: 1280px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .logo { font-size: 26px; }
+        h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+        .badge-cluster { display: flex; gap: 10px; align-items: center; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pulse { width: 7px; height: 7px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
+        .link-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .link-pill:hover { background: rgba(56, 189, 248, 0.2); }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+        .kpi-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+        .kpi-value { font-size: 28px; font-weight: 800; color: #fff; }
+        .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .tab-btn.active { color: var(--primary); background: rgba(56, 189, 248, 0.12); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Card and Forms */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .card-title { font-size: 16px; font-weight: 700; color: #fff; }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        input, select, textarea {
+            background: #090e1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        .btn-primary {
+            background: var(--primary);
+            color: #090d16;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0b1120;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            background: var(--surface-card);
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-size: 13px;
+        }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .badge-a { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+        .badge-b { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+        .badge-faq { background: rgba(192, 132, 252, 0.15); color: var(--purple); }
+        .badge-code { font-family: monospace; background: rgba(255, 255, 255, 0.06); padding: 2px 6px; border-radius: 4px; }
+
+        /* Sandbox Result */
+        .sandbox-result {
+            background: #090e1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+        .sandbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .sandbox-box { background: rgba(255, 255, 255, 0.03); padding: 10px 12px; border-radius: 6px; }
+        .sandbox-box-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .sandbox-box-val { font-size: 14px; font-weight: 700; }
+        .sandbox-reply { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); padding: 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; line-height: 1.5; }
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 24px; max-width: 480px; width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <span class="logo">⚡</span>
+                <div>
+                    <h1>Pelid Enterprise Admin Console</h1>
+                    <span style="font-size: 12px; color: var(--text-muted);">AI Decision Gateway • Production Management</span>
+                </div>
+            </div>
+            <div class="badge-cluster">
+                <a href="/docs" target="_blank" class="link-pill">Swagger API Docs</a>
+                <a href="/" class="link-pill">Live Dashboard</a>
+                <div class="status-pill"><div class="pulse"></div> Gateway: Online</div>
+            </div>
+        </header>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Intercepted</div>
+                <div class="kpi-value" id="kpi-total">0</div>
+                <div class="kpi-sub">Total production turns</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Local Resolution Rate</div>
+                <div class="kpi-value" id="kpi-rate" style="color: var(--success);">0%</div>
+                <div class="kpi-sub">Sub-20ms ($0.00) Path A</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Cost Saved (USD)</div>
+                <div class="kpi-value" id="kpi-cost" style="color: var(--primary);">$0.00</div>
+                <div class="kpi-sub">vs. GPT-4o frontier baseline</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Tokens Saved</div>
+                <div class="kpi-value" id="kpi-tokens">0</div>
+                <div class="kpi-sub">Local prompt &amp; completion tokens</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('feed')">📡 Live Request Feed</button>
+            <button class="tab-btn" onclick="switchTab('sandbox')">🧪 Intent &amp; FAQ Inspector</button>
+            <button class="tab-btn" onclick="switchTab('tenants')">🔑 API Keys &amp; Tenants</button>
+            <button class="tab-btn" onclick="switchTab('faqs')">📚 Zero-Code Knowledge Base (FAQs)</button>
+        </div>
+
+        <!-- TAB 1: Live Request Feed -->
+        <div id="tab-feed" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Live Intercepted Requests (Last 50)</span>
+                    <button class="btn-primary" onclick="loadOverview()" style="padding: 6px 12px; font-size: 12px;">Refresh</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Query</th>
+                                <th>Lang</th>
+                                <th>Intent / FAQ</th>
+                                <th>Path</th>
+                                <th>Latency</th>
+                                <th>Tokens Saved</th>
+                                <th>Tenant</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-tbody">
+                            <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Intent & FAQ Inspector Sandbox -->
+        <div id="tab-sandbox" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Interactive Query Inspector</span>
+                    <span style="font-size: 12px; color: var(--text-muted);">Test sentences in English, Hinglish, or Manglish</span>
+                </div>
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                    <input type="text" id="sandbox-input" placeholder="e.g. 'Where is my order #9921?' or 'Do you deliver to Bangalore?' or 'enikk sathanam cracked aayitt vannath'" style="flex: 1;" onkeydown="if(event.key==='Enter') runSandboxTest()">
+                    <button class="btn-primary" onclick="runSandboxTest()">Inspect Query</button>
+                </div>
+                <div id="sandbox-result" class="sandbox-result">
+                    <div class="sandbox-grid">
+                        <div class="sandbox-box">
+                            <div class="sandbox-box-label">Resolution Path</div>
+                            <div class="sandbox-box-val" id="res-path">-</div>
+                        </div>
+                        <div class="sandbox-box">
+                            <div class="sandbox-box-label">Detected Intent / FAQ</div>
+                            <div class="sandbox-box-val" id="res-intent">-</div>
+                        </div>
+                        <div class="sandbox-box">
+                            <div class="sandbox-box-label">Confidence / Score</div>
+                            <div class="sandbox-box-val" id="res-confidence">-</div>
+                        </div>
+                        <div class="sandbox-box">
+                            <div class="sandbox-box-label">Latency</div>
+                            <div class="sandbox-box-val" id="res-latency">-</div>
+                        </div>
+                    </div>
+                    <div class="sandbox-box-label">Extracted Slots</div>
+                    <div id="res-slots" class="badge-code" style="margin-bottom: 12px; display: inline-block;">{}</div>
+                    <div class="sandbox-box-label">Synthesized Assistant Reply (Path A / B)</div>
+                    <div class="sandbox-reply" id="res-reply">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: API Keys & Tenants -->
+        <div id="tab-tenants" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Generate Scoped API Key</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tenant ID (Unique Slug)</label>
+                        <input type="text" id="new-tenant-id" placeholder="e.g. acme_corp_bot">
+                    </div>
+                    <div class="form-group">
+                        <label>Company / Application Name</label>
+                        <input type="text" id="new-tenant-name" placeholder="e.g. Acme Corp Customer Support">
+                    </div>
+                    <div class="form-group">
+                        <label>Rate Limit (Requests / Minute)</label>
+                        <input type="number" id="new-tenant-rpm" value="60">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="createKey()">Generate API Key</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Active Tenant API Keys</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Key Prefix</th>
+                                <th>Rate Limit (RPM)</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tenants-tbody">
+                            <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading tenants...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Zero-Code Knowledge Base (FAQs) -->
+        <div id="tab-faqs" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Add Company FAQ (Zero Neural Retraining)</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Customer Question</label>
+                        <input type="text" id="new-faq-q" placeholder="e.g. 'Do you deliver to Bangalore?'">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="new-faq-cat" placeholder="e.g. logistics, billing, policy" value="general">
+                    </div>
+                    <div class="form-group" style="grid-column: span 3;">
+                        <label>Company-Approved Answer (Path A $0.00)</label>
+                        <textarea id="new-faq-a" rows="3" placeholder="e.g. 'Yes! We offer same-day and next-day delivery across Bangalore.'"></textarea>
+                    </div>
+                    <div class="form-group" style="grid-column: span 3;">
+                        <label>Phrasing Variations (Comma-separated)</label>
+                        <input type="text" id="new-faq-vars" placeholder="e.g. 'Can you ship to Bengaluru?, Is Bangalore delivery supported?'">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="addFaq()">Save FAQ &amp; Embed Index</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Active FAQs (<span id="faq-count">0</span> Indexed with ModernBERT)</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Question</th>
+                                <th>Answer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faqs-tbody">
+                            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading FAQs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Display Modal -->
+    <div id="key-modal" class="modal">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 8px; color: #fff;">🔑 Scoped API Key Generated</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+                Please copy your API key now. For security reasons, Pelid only stores a one-way SHA-256 cryptographic hash and this key cannot be recovered if lost.
+            </p>
+            <div style="background: #090e1a; border: 1px solid var(--border); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--primary); word-break: break-all; margin-bottom: 16px;" id="modal-key-display">
+                pelid_live_...
+            </div>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal()">I Have Saved This Key</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        async function loadOverview() {
+            try {
+                const res = await fetch('/api/admin/overview');
+                const data = await res.json();
+                
+                // Update KPIs
+                document.getElementById('kpi-total').innerText = (data.kpis.total_requests || 0).toLocaleString();
+                document.getElementById('kpi-rate').innerText = (data.kpis.path_a_rate || 0) + '%';
+                document.getElementById('kpi-cost').innerText = '$' + (data.kpis.cost_saved_usd || 0).toFixed(4);
+                document.getElementById('kpi-tokens').innerText = (data.kpis.tokens_saved || 0).toLocaleString();
+
+                // Update Logs
+                const tbody = document.getElementById('logs-tbody');
+                if (data.recent_logs && data.recent_logs.length > 0) {
+                    tbody.innerHTML = data.recent_logs.map(log => `
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 11px;">${log.timestamp.split('T')[1] || log.timestamp}</td>
+                            <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(log.query)}</td>
+                            <td><span class="badge-code">${log.language}</span></td>
+                            <td><span class="badge-code">${log.intent}</span></td>
+                            <td><span class="badge ${log.path === 'A' ? 'badge-a' : 'badge-b'}">Path ${log.path}</span></td>
+                            <td>${log.latency_ms.toFixed(1)}ms</td>
+                            <td style="color: var(--success); font-weight: 600;">+${log.tokens_saved}</td>
+                            <td style="color: var(--text-muted);">${log.tenant_id}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No requests processed yet.</td></tr>';
+                }
+
+                // Update Tenants
+                const tBody = document.getElementById('tenants-tbody');
+                if (data.tenants && data.tenants.length > 0) {
+                    tBody.innerHTML = data.tenants.map(t => `
+                        <tr>
+                            <td><span class="badge-code">${t.id}</span></td>
+                            <td style="font-weight: 600;">${escapeHtml(t.name)}</td>
+                            <td><span class="badge-code">${t.key_prefix}...</span></td>
+                            <td>${t.rate_limit_rpm} req/m</td>
+                            <td><span class="badge ${t.is_active ? 'badge-a' : 'badge-b'}">${t.is_active ? 'Active' : 'Revoked'}</span></td>
+                            <td style="font-size: 11px; color: var(--text-muted);">${t.created_at}</td>
+                            <td>
+                                ${t.is_active ? `<button class="btn-danger" onclick="revokeKey('${t.id}')">Revoke</button>` : '<span style="color: var(--text-muted); font-size: 11px;">Revoked</span>'}
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No tenants created yet.</td></tr>';
+                }
+
+                // Update FAQs
+                const fBody = document.getElementById('faqs-tbody');
+                document.getElementById('faq-count').innerText = (data.faqs || []).length;
+                if (data.faqs && data.faqs.length > 0) {
+                    fBody.innerHTML = data.faqs.map(f => `
+                        <tr>
+                            <td><span class="badge-code">${f.id}</span></td>
+                            <td><span class="badge badge-faq">${f.category}</span></td>
+                            <td style="font-weight: 600;">${escapeHtml(f.question)}</td>
+                            <td style="color: var(--text-muted);">${escapeHtml(f.answer)}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error("Overview error:", e);
+            }
+        }
+
+        async function runSandboxTest() {
+            const input = document.getElementById('sandbox-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            try {
+                const res = await fetch('/api/admin/test', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                const d = await res.json();
+                document.getElementById('sandbox-result').style.display = 'block';
+                document.getElementById('res-path').innerHTML = `<span class="badge ${d.path === 'A' ? 'badge-a' : 'badge-b'}">Path ${d.path}</span>`;
+                document.getElementById('res-intent').innerText = d.intent;
+                document.getElementById('res-confidence').innerText = d.confidence + '%';
+                document.getElementById('res-latency').innerText = d.latency_ms + 'ms';
+                document.getElementById('res-slots').innerText = JSON.stringify(d.slots || {});
+                document.getElementById('res-reply').innerText = d.response;
+            } catch (e) {
+                alert("Inspection error: " + e);
+            }
+        }
+
+        async function createKey() {
+            const id = document.getElementById('new-tenant-id').value.trim();
+            const name = document.getElementById('new-tenant-name').value.trim();
+            const rpm = parseInt(document.getElementById('new-tenant-rpm').value) || 60;
+            if (!id || !name) { alert("Please provide both Tenant ID and Name"); return; }
+
+            try {
+                const res = await fetch('/api/admin/keys', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id, name, rate_limit_rpm: rpm})
+                });
+                const data = await res.json();
+                if (data.raw_key) {
+                    document.getElementById('modal-key-display').innerText = data.raw_key;
+                    document.getElementById('key-modal').style.display = 'flex';
+                    document.getElementById('new-tenant-id').value = '';
+                    document.getElementById('new-tenant-name').value = '';
+                    loadOverview();
+                } else {
+                    alert("Error creating key: " + (data.error || "Unknown error"));
+                }
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        }
+
+        async function revokeKey(tenantId) {
+            if (!confirm(`Are you sure you want to revoke API key for '${tenantId}'? This is irreversible.`)) return;
+            try {
+                const res = await fetch(`/api/admin/keys/${tenantId}`, {method: 'DELETE'});
+                const data = await res.json();
+                if (data.success) {
+                    loadOverview();
+                } else {
+                    alert("Error: " + (data.error || "Failed to revoke"));
+                }
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        }
+
+        async function addFaq() {
+            const q = document.getElementById('new-faq-q').value.trim();
+            const a = document.getElementById('new-faq-a').value.trim();
+            const cat = document.getElementById('new-faq-cat').value.trim() || 'general';
+            const varsRaw = document.getElementById('new-faq-vars').value.trim();
+            const vars = varsRaw ? varsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+            if (!q || !a) { alert("Please provide both question and answer"); return; }
+
+            try {
+                const res = await fetch('/api/admin/faqs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: q, answer: a, category: cat, variations: vars})
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    document.getElementById('new-faq-q').value = '';
+                    document.getElementById('new-faq-a').value = '';
+                    document.getElementById('new-faq-vars').value = '';
+                    loadOverview();
+                    alert("FAQ indexed successfully!");
+                }
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('key-modal').style.display = 'none';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Initialize and poll overview every 3 seconds
+        loadOverview();
+        setInterval(loadOverview, 3000);
+    </script>
+</body>
+</html>

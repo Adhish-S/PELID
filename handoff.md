@@ -44,17 +44,22 @@ Modern generative AI architectures suffer from massive cost and latency waste:
 * **Remote Sync Boundary**: Commits are held locally until the user approves pushing to `origin/main`. The `developer-domain` branch is strictly held until the gateway is validated.
 
 ### Test Suite Status
-* **18/18 Unit Tests Pass** in ~12 seconds:
+* **36/36 Unit & Integration Tests Pass** in ~16 seconds:
   * `tests/test_action_engine.py` (3 tests)
-  * `tests/test_auth.py` (4 tests)
-  * `tests/test_pelid_end_to_end.py` (5 tests)
-  * `tests/test_routing_accuracy.py` (6 tests: compound Manglish/Hinglish/English defect queries, greetings, destructive overrides, and `/api/simulate`).
+  * `tests/test_action_security.py` (5 tests: SSRF defense, cloud metadata block, nested JSONPath)
+  * `tests/test_admin_api.py` (5 tests: admin console HTML, overview metrics, key creation/revocation, FAQ creation)
+  * `tests/test_auth.py` (4 tests: SHA-256 keys, rate limits, proxy integration)
+  * `tests/test_faq_engine.py` (5 tests: ModernBERT semantic matching, variation coverage, false-positive rejection, dynamic additions, Path A resolution)
+  * `tests/test_pelid_end_to_end.py` (5 tests: tri-lingual detection, mock CRM, budget, destructive guardrails, routing)
+  * `tests/test_routing_accuracy.py` (6 tests: compound Manglish/Hinglish/English defect queries, greetings, destructive overrides, /api/simulate)
+  * `tests/test_session_dialogue.py` (3 tests: multi-turn slot fulfillment, pending dialogue record, topic shift reset, E2E proxy tracking)
 
 ### Benchmark & Model Performance (Zero Data Leakage)
 * **Training Dataset** ([`data/training_data.csv`](file:///D:/PELID/PELID/data/training_data.csv)): **2,031 clean base samples** (expanded to 2,231–2,335 via typo augmentation) across all 21 intents (100–119 samples/intent).
 * **Held-Out Test Set** ([`data/seed_examples.txt`](file:///D:/PELID/PELID/data/seed_examples.txt)): **124 strictly unseen samples**. Overlap with training data is **strictly 0**.
 * **Multilingual Head (`mmBERT` 768-dim ONNX)**: **88.7%** true out-of-sample accuracy (ECE: 0.056, T: 1.929).
 * **English Head (`ModernBERT` 1024-dim ONNX)**: **82.3%** true out-of-sample accuracy (+19.7% over baseline, ECE: 0.036, T: 1.928).
+* **Universal FAQ Engine**: <5ms semantic vector matching with lexical token gating for zero false positives.
 * **End-to-End Hybrid Pipeline**: 100% accuracy on integration test suites by combining the fast-path pre-router with neural inference.
 
 ---

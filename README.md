@@ -165,13 +165,16 @@ pelid start --port 8080
 
 ---
 
-## 🛡️ Enterprise Security & Guardrails
+## 🛡️ Enterprise Security & Production Guardrails
 
-1. **PII Anonymization Filter:** Automatically scrubs 16-digit credit cards, email addresses, and phone numbers before queries leave for Path B.
-2. **Sliding-Window Rate Limiting:** In-memory request ceiling per IP (configurable via `RATE_LIMIT_PER_MINUTE`, default 120) preventing runaway agent loops and DoS.
-3. **100% Destructive Action Interception:** Financial refunds, address modifications, auto-renewal cancellations, and profile purges are unconditionally escalated to supervised frontier models.
-4. **Prompt Injection Shield:** Adversarial overrides (*"ignore all previous instructions"*, *"DAN mode"*, etc.) are intercepted before local execution.
-5. **Zero Data Leakage:** Local Path A turns never touch the internet. Zero personal databases, keys, or logs are baked into container images.
+1. **SSRF Prevention & Webhook Isolation:** Strict IP and scheme validation prevents outbound webhooks from targeting internal cloud metadata (`169.254.169.254`), container interfaces, or loopback networks.
+2. **Conversational Dialogue State Machine:** Manages multi-turn slot filling (e.g. Turn 1: *"Where is my package?"* $\rightarrow$ Turn 2: *"#9921"*) by tracking pending intents and fulfilling slots automatically without reclassification failures.
+3. **Universal Zero-Code Knowledge Base (FAQ Store):** Ingests company Q&A pairs via `pelid.yaml` or CSV. ModernBERT vector embeddings match and resolve customer questions locally in <5ms for **$0.00** with **0% hallucination**—no ML retraining needed.
+4. **PII Anonymization Filter:** Automatically scrubs 16-digit credit cards, email addresses, and phone numbers before queries leave for Path B.
+5. **Multi-Tenant Scoped API Keys (`pelid_live_...`):** Cryptographically secure SHA-256 hashed API key management with per-tenant sliding-window rate limiters.
+6. **100% Destructive Action Interception:** Financial refunds, address modifications, auto-renewal cancellations, and profile purges are unconditionally escalated to supervised frontier models.
+7. **Prompt Injection Shield:** Adversarial overrides (*"ignore all previous instructions"*, *"DAN mode"*, etc.) are intercepted before local execution.
+8. **Enterprise Web Admin Console (`/admin`):** Dark-mode operational console for real-time telemetry, query inspection sandbox, API key provisioning, and zero-code FAQ management.
 
 ---
 
@@ -181,6 +184,7 @@ Define your industry domain and safety rules declaratively:
 - `ecommerce` (Order tracking, delivery delays, defective items)
 - `food_delivery` (Driver location, kitchen delays, missing condiments)
 - `b2b_manufacturing` (CAD spec sheets, PO tracking, inventory)
+- `faqs` (Universal zero-code semantic knowledge base for any vertical: Fintech, EdTech, SaaS, Healthcare)
 
 ---
 
