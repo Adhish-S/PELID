@@ -70,7 +70,7 @@ def test_proxy_multi_turn_slot_fulfillment_e2e():
         headers={"X-Session-ID": session_id},
         json={
             "model": "gpt-4o",
-            "messages": [{"role": "user", "content": "Where is my package?"}],
+            "messages": [{"role": "user", "content": "Can you please track my delivery?"}],
         },
     )
     assert res1.status_code == 200
@@ -85,7 +85,7 @@ def test_proxy_multi_turn_slot_fulfillment_e2e():
         json={
             "model": "gpt-4o",
             "messages": [
-                {"role": "user", "content": "Where is my package?"},
+                {"role": "user", "content": "Can you please track my delivery?"},
                 {"role": "assistant", "content": reply1},
                 {"role": "user", "content": "#9921"},
             ],

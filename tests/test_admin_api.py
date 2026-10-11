@@ -73,10 +73,29 @@ def test_admin_query_inspector(client: TestClient):
     """Test query inspection sandbox endpoint."""
     res = client.post(
         "/api/admin/test",
-        json={"query": "Where is my package #9921?"},
+        json={"query": "Can you check tracking for parcel #9921?"},
     )
     assert res.status_code == 200
     data = res.json()
     assert "path" in data
     assert "intent" in data
     assert "latency_ms" in data
+
+
+def test_admin_auth_security(monkeypatch, client: TestClient):
+    """Verify that setting PELID_ADMIN_KEY enforces strict auth on admin endpoints."""
+    monkeypatch.setenv("PELID_ADMIN_KEY", "super_secret_admin_master_key_99")
+
+    # 1. Without header -> 403 Forbidden
+    res_no_key = client.get("/api/admin/overview")
+    assert res_no_key.status_code == 403
+
+    # 2. With wrong header -> 403 Forbidden
+    res_bad_key = client.get("/api/admin/overview", headers={"X-Pelid-Admin-Key": "wrong_key"})
+    assert res_bad_key.status_code == 403
+
+    # 3. With valid header -> 200 OK
+    res_valid_key = client.get("/api/admin/overview", headers={"X-Pelid-Admin-Key": "super_secret_admin_master_key_99"})
+    assert res_valid_key.status_code == 200
+    assert "kpis" in res_valid_key.json()
+

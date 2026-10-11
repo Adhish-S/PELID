@@ -48,7 +48,7 @@ order_status,Will my package arrive before 5 PM today?
 order_status,where is my order
 order_status,where is my package
 order_status,mera order kahaa hai bhai?
-order_status,Where is my order #9921?
+order_status,Where is my order #48210?
 order_status,ennte package eedeya ulle?
 order_status,kahaa hai mera order
 order_status,oreder status track karo
@@ -171,7 +171,7 @@ refund_request,Refund transaction reference ID do
 refund_request,"Ente accountil cash vannilla, return eduthitt 5 days aayi"
 refund_request,I demand a full refund for this terrible experience
 refund_request,"Cancel kiya tha order, paise kab wapas aayenge?"
-refund_request,"Cancelled order #9921, refund not reflecting in credit card"
+refund_request,"Cancelled order #48210, refund not reflecting in credit card"
 refund_request,"Refund amount incorrect, deducted shipping charges without reason"
 refund_request,Paise kam refund kyu kiye? Full refund chahiye
 refund_request,Full amount refund aano kittuka?
@@ -986,7 +986,7 @@ shipping_address_change,Package pe recipient ka naam change kardo
 shipping_address_change,Parcel receive cheyyunna aalude name maattanam
 shipping_address_change,Please divert package #5512 to my current live location
 wrong_or_defective_item,parcel delivered today but when i opened the box the screen was cracked
-wrong_or_defective_item,aaj subah parcel mila tha par khola toh andar se toota nikla
+wrong_or_defective_item,kal shaam parcel receive hua tha lekin seal kholi toh toot gaya tha
 wrong_or_defective_item,vannu package pakshe thorannappo pottiyathaanu
 wrong_or_defective_item,"received package 10 mins ago, item is completely broken inside"
 wrong_or_defective_item,box intact tha par item cracked tha
@@ -1005,7 +1005,7 @@ wrong_or_defective_item,glass cup was broken into pieces inside the parcel
 wrong_or_defective_item,shoes wrong size 8 instead of size 10 sent
 wrong_or_defective_item,sathanam pottiyatha vannath enthanu cheyyendath?
 wrong_or_defective_item,box damaged hai aur andar ki screen tooti hui hai
-wrong_or_defective_item,received damaged piece for order #9921
+wrong_or_defective_item,received damaged piece for order #48210
 wrong_or_defective_item,cracked screen delivered today please replace immediately
 wrong_or_defective_item,parcel delivered but goods are broken
 wrong_or_defective_item,item damaged inside unopened box
@@ -1039,13 +1039,13 @@ wrong_or_defective_item,tampered box with cracked glass inside
 wrong_or_defective_item,morning delivered box has cracked product
 wrong_or_defective_item,"sathanam potti kidakkunnu, photo eduthu vechittund"
 wrong_or_defective_item,order deliver ho gaya par andar ka piece toota hai
-general_chitchat_or_faq,Hi
+general_chitchat_or_faq,hey there assistant
 general_chitchat_or_faq,Hello
 general_chitchat_or_faq,hey
-general_chitchat_or_faq,good morning
+general_chitchat_or_faq,wishing you a pleasant morning
 general_chitchat_or_faq,good afternoon
 general_chitchat_or_faq,good evening
-general_chitchat_or_faq,namaskaram
+general_chitchat_or_faq,ellavarkkum namaskaram
 general_chitchat_or_faq,namaste
 general_chitchat_or_faq,hi team
 general_chitchat_or_faq,hello customer support
@@ -1093,7 +1093,7 @@ general_chitchat_or_faq,nice talking to you
 general_chitchat_or_faq,thanks team
 general_chitchat_or_faq,great bot
 general_chitchat_or_faq,awesome support
-order_status,where is my order #9921?
+order_status,where is my order #48210?
 order_status,can you check the status of my order #8491?
 order_status,order #10292 kahan tak pahuncha?
 order_status,ente order #7712 evide ethi?
@@ -1143,7 +1143,7 @@ order_status,kripya order #6629 ka status batayein
 order_status,ente courier tracking status venam
 order_status,check delivery for order #1190
 order_status,is order #8841 out for delivery?
-order_delayed_or_missing,"order #9921 is 3 days delayed, where is it?"
+order_delayed_or_missing,"order #48210 is 3 days delayed, where is it?"
 order_delayed_or_missing,my shipment has not moved for 4 days
 order_delayed_or_missing,parcel was supposed to come yesterday but not delivered
 order_delayed_or_missing,4 din se order atka hua hai ek hi jagah
@@ -1182,7 +1182,7 @@ order_delayed_or_missing,unreasonable delivery delay for order #7712
 order_delayed_or_missing,no update on dispatch delay
 order_delayed_or_missing,dispatch hoke 5 din ho gaye abhi tak late hai
 order_delayed_or_missing,dispatch aayitt 4 divasam aayi ithuvare vannilla
-order_delayed_or_missing,severe delay in delivery order #9921
+order_delayed_or_missing,severe delay in delivery order #48210
 order_delayed_or_missing,courier partner delay investigation
 order_delayed_or_missing,parcel late hone ki wajah se pareshan hoon
 order_delayed_or_missing,delivery late aayathu kondu njan budhimuttil aan
@@ -1193,7 +1193,7 @@ order_delayed_or_missing,logistics delay complaint
 order_delayed_or_missing,please expedite my delayed order #8801
 order_delayed_or_missing,jaldi delivery karwao delay ho raha hai
 order_delayed_or_missing,delayed package status enquiry
-cancel_order,please cancel my order #9921 immediately
+cancel_order,please cancel my order #48210 immediately
 cancel_order,i want to cancel order #4491 right now
 cancel_order,"galti se do baar order ho gaya, cancel kardo"
 cancel_order,ente order #7712 cancel cheyyanam
@@ -1240,10 +1240,10 @@ cancel_order,galti se place hua order cancel karein
 cancel_order,mistake aayi order aayathaanu cancel cheyyu
 cancel_order,cancel order #4411 and credit wallet
 cancel_order,stop courier and cancel order
-cancel_order,please cancel shipment #9921
+cancel_order,please cancel shipment #48210
 cancel_order,cancel order with high priority
 cancel_order,order cancellation request
-refund_request,i demand a full refund for order #9921
+refund_request,i demand a full refund for order #48210
 refund_request,when will my refund be credited to my account?
 refund_request,mera refund kab tak aayega account me?
 refund_request,ente refund eppozhanu accountil varika?
@@ -1293,7 +1293,7 @@ refund_request,arn number for bank refund
 refund_request,refund confirmation receipt
 refund_request,transfer refund to google pay
 refund_request,refund status enquiry
-return_or_exchange,i want to return order #9921 for a replacement
+return_or_exchange,i want to return order #48210 for a replacement
 return_or_exchange,how do i exchange this shirt for a larger size?
 return_or_exchange,size chota hai exchange karna hai
 return_or_exchange,size cheruthannu large size aakki tharumo?
@@ -1393,7 +1393,7 @@ payment_failure,payment verification pending since morning
 payment_failure,netbanking debit confirmation query
 payment_failure,stuck payment refund assistance
 payment_failure,payment debited order not confirmed
-invoice_or_receipt,can i get the gst tax invoice for order #9921?
+invoice_or_receipt,can i get the gst tax invoice for order #48210?
 invoice_or_receipt,download bill receipt for my purchase
 invoice_or_receipt,order #4410 ka bill invoice download karna hai
 invoice_or_receipt,ente purchase bill receipt download cheyyanam
@@ -1430,7 +1430,7 @@ invoice_or_receipt,bill pe company name galat hai change karo
 invoice_or_receipt,billil company name thettanu
 invoice_or_receipt,download receipt for warranty service
 invoice_or_receipt,official purchase voucher download
-invoice_or_receipt,sales invoice for order #9921
+invoice_or_receipt,sales invoice for order #48210
 invoice_or_receipt,tax breakdown receipt query
 invoice_or_receipt,hsn code invoice download
 invoice_or_receipt,generate invoice with my pan number
@@ -1550,7 +1550,7 @@ billing_dispute,billil kooduthal cash charge cheythittund
 billing_dispute,hidden delivery charges added without notice
 billing_dispute,bill me extra charges kyu lagaye gaye hain?
 billing_dispute,extra amount charge cheyyan kaaranam enthanu?
-billing_dispute,overcharged for order #9921
+billing_dispute,overcharged for order #48210
 billing_dispute,discount coupon amount not deducted from bill
 billing_dispute,coupon discount minus nahi kiya bill me
 billing_dispute,coupon discount kurachilla billil
@@ -1693,7 +1693,7 @@ delete_account,close customer profile permanently
 delete_account,terminate user account now
 delete_account,full account data purge
 delete_account,delete account request
-shipping_address_change,change delivery address for order #9921
+shipping_address_change,change delivery address for order #48210
 shipping_address_change,entered wrong address by mistake update to new home
 shipping_address_change,delivery location maattanam order placed aanu
 shipping_address_change,update shipping address for order #4410
@@ -1744,7 +1744,7 @@ shipping_address_change,change shipping address request
 shipping_address_change,shipping address modification
 update_account_details,how to update email address in profile settings?
 update_account_details,profile me naya mobile number update karna hai
-update_account_details,profile-il email address maattanam
+update_account_details,ente accountile email id update cheyyaan vendi entha cheyyendath?
 update_account_details,update name and surname in customer profile
 update_account_details,profile me naam kaise badlein?
 update_account_details,peru maattan ulla option evide?
@@ -1932,9 +1932,9 @@ pricing_or_plan_question,membership cost query
 pricing_or_plan_question,fee structure for quick commerce
 pricing_or_plan_question,pricing plan details
 pricing_or_plan_question,pricing or plan inquiry
-feature_request_or_feedback,great service really impressed with fast delivery
-feature_request_or_feedback,app mast hai bass wishlist feature bhi add kardo
-feature_request_or_feedback,nalla app aan pakshe wishlist feature koode venam
+feature_request_or_feedback,"super fast shipping and great customer experience, loved it"
+feature_request_or_feedback,application kafi smooth hai bas dark mode ka option laao
+feature_request_or_feedback,app super aanu pakshe cart save cheyyan ulla option koode venam
 feature_request_or_feedback,add sodexo card payment support in app
 feature_request_or_feedback,meal voucher payment shuru karo app me
 feature_request_or_feedback,sodexo card payment support cheyyumo?

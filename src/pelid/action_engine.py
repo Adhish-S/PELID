@@ -16,6 +16,7 @@ import re
 import time
 import urllib.parse
 import ipaddress
+import socket
 from typing import Any, Dict, Optional
 import httpx
 
@@ -26,8 +27,8 @@ from pelid.mock_crm import lookup_order as mock_lookup_order
 def is_safe_webhook_url(url: str) -> tuple[bool, str]:
     """
     Enterprise SSRF Guardrail.
-    Blocks requests to loopback, link-local, cloud metadata, and private IP spaces
-    unless explicitly enabled via PELID_ALLOW_LOCAL_WEBHOOKS=true.
+    Blocks requests to loopback, link-local, cloud metadata, private IP spaces,
+    and DNS rebinding targets unless explicitly enabled via PELID_ALLOW_LOCAL_WEBHOOKS=true.
     """
     allow_local = os.getenv("PELID_ALLOW_LOCAL_WEBHOOKS", "false").lower() in ("true", "1", "yes")
     try:
@@ -49,12 +50,26 @@ def is_safe_webhook_url(url: str) -> tuple[bool, str]:
         # Check IP address resolution if hostname is an IP
         try:
             ip = ipaddress.ip_address(hostname)
-            if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved:
+            if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved or ip.is_multicast:
                 return False, f"Blocked: Target IP '{hostname}' is non-routable/private (SSRF prevention)"
+            return True, "Safe URL"
         except ValueError:
-            # Hostname is a domain name
-            if hostname.lower() in ("localhost", "127.0.0.1", "0.0.0.0", "::1"):
-                return False, "Blocked: Localhost loopback detected (SSRF prevention)"
+            pass
+
+        # Hostname is a domain name — check local blocklist
+        if hostname.lower() in ("localhost", "127.0.0.1", "0.0.0.0", "::1"):
+            return False, "Blocked: Localhost loopback detected (SSRF prevention)"
+
+        # DNS resolution check to prevent DNS rebinding attacks (e.g. 127.0.0.1.nip.io)
+        try:
+            resolved_addrs = socket.getaddrinfo(hostname, None)
+            for _, _, _, _, sockaddr in resolved_addrs:
+                ip_str = sockaddr[0]
+                ip = ipaddress.ip_address(ip_str)
+                if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+                    return False, f"Blocked: Hostname '{hostname}' resolves to private/internal IP {ip_str} (DNS rebinding prevention)"
+        except socket.gaierror:
+            return False, f"Blocked: Cannot resolve hostname '{hostname}'"
 
         return True, "Safe URL"
     except Exception as e:
@@ -214,7 +229,7 @@ class DeclarativeActionEngine:
             headers[hk] = h_str
 
         try:
-            async with httpx.AsyncClient(timeout=timeout_sec) as client:
+            async with httpx.AsyncClient(timeout=timeout_sec, follow_redirects=False) as client:
                 if method == "GET":
                     resp = await client.get(url, headers=headers)
                 elif method == "POST":

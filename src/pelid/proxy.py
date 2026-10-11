@@ -15,7 +15,9 @@ Features:
 """
 
 import asyncio
+import hmac
 import json
+import os
 import time
 from pathlib import Path
 import httpx
@@ -311,9 +313,39 @@ async def root_dashboard():
     )
 
 
+def verify_admin_access(request: Request) -> bool:
+    """
+    Enforce security on admin console and endpoints:
+    1. If PELID_ADMIN_KEY is set in environment, check header X-Pelid-Admin-Key or Authorization Bearer.
+    2. If PELID_ADMIN_KEY is not set, allow requests only from localhost / loopback ('127.0.0.1', '::1', 'testclient', 'localhost').
+    3. All external requests without valid PELID_ADMIN_KEY are rejected with 403 Forbidden.
+    """
+    admin_key = os.getenv("PELID_ADMIN_KEY", "").strip()
+    client_host = getattr(request.client, "host", "") if request.client else ""
+
+    provided_key = request.headers.get("X-Pelid-Admin-Key", "").strip()
+    if not provided_key:
+        auth_header = request.headers.get("Authorization", "").strip()
+        if auth_header.startswith("Bearer "):
+            provided_key = auth_header[7:].strip()
+
+    if admin_key:
+        if not provided_key:
+            return False
+        return hmac.compare_digest(provided_key, admin_key)
+
+    is_local = client_host in ("127.0.0.1", "::1", "localhost", "testclient") or client_host.startswith("127.")
+    return is_local
+
+
 @app.get("/admin", response_class=HTMLResponse)
-async def admin_console():
+async def admin_console(request: Request):
     """Interactive Enterprise Management Console loaded from static/admin.html."""
+    if not verify_admin_access(request):
+        return HTMLResponse(
+            status_code=403,
+            content="<h1>403 Forbidden</h1><p>Admin console access is restricted. Provide X-Pelid-Admin-Key or connect from localhost.</p>",
+        )
     if not _ADMIN_PATH.exists():
         return JSONResponse(status_code=404, content={"error": "admin.html not found"})
     return HTMLResponse(
@@ -327,8 +359,10 @@ async def admin_console():
 
 
 @app.get("/api/admin/overview")
-async def admin_overview():
+async def admin_overview(request: Request):
     """Real-time metrics, recent logs, active tenants, and FAQs."""
+    if not verify_admin_access(request):
+        return JSONResponse(status_code=403, content={"error": "Admin access forbidden: invalid key or non-local request"})
     from pelid.auth import list_tenants
     from pelid.faq_engine import get_faq_engine
     summary = get_analytics_summary()
@@ -357,6 +391,8 @@ async def admin_overview():
 @app.post("/api/admin/keys")
 async def admin_create_key(request: Request):
     """Generate a new tenant API key."""
+    if not verify_admin_access(request):
+        return JSONResponse(status_code=403, content={"error": "Admin access forbidden: invalid key or non-local request"})
     from pelid.auth import create_tenant
     try:
         body = await request.json()
@@ -377,8 +413,10 @@ async def admin_create_key(request: Request):
 
 
 @app.delete("/api/admin/keys/{tenant_id}")
-async def admin_revoke_key(tenant_id: str):
+async def admin_revoke_key(tenant_id: str, request: Request):
     """Revoke a tenant API key."""
+    if not verify_admin_access(request):
+        return JSONResponse(status_code=403, content={"error": "Admin access forbidden: invalid key or non-local request"})
     from pelid.auth import revoke_tenant
     ok = revoke_tenant(tenant_id)
     return {"success": ok}
@@ -387,6 +425,8 @@ async def admin_revoke_key(tenant_id: str):
 @app.post("/api/admin/faqs")
 async def admin_add_faq(request: Request):
     """Add a new custom FAQ."""
+    if not verify_admin_access(request):
+        return JSONResponse(status_code=403, content={"error": "Admin access forbidden: invalid key or non-local request"})
     from pelid.faq_engine import get_faq_engine
     try:
         body = await request.json()
@@ -406,7 +446,10 @@ async def admin_add_faq(request: Request):
 @app.post("/api/admin/test")
 async def admin_test_query(request: Request):
     """Live query inspection sandbox."""
+    if not verify_admin_access(request):
+        return JSONResponse(status_code=403, content={"error": "Admin access forbidden: invalid key or non-local request"})
     return await simulate_endpoint(request)
+
 
 
 # ─── 3. SSE Stream Generators ────────────────────────────────

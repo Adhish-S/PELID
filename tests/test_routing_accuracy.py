@@ -38,7 +38,7 @@ async def test_compound_defect_sentence_english():
 
 @pytest.mark.asyncio
 async def test_compound_defect_sentence_hinglish():
-    query = "aaj subah parcel mila tha par khola toh andar se toota nikla"
+    query = "aaj subah packet mila tha lekin kholne par product poori tarah se toota nikla"
     lang = detect_language(query)
     decision = await run_decision(query, language=lang)
     assert decision.label == "wrong_or_defective_item"

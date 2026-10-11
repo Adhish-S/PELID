@@ -37,6 +37,18 @@ def test_ssrf_blocks_private_and_loopback():
         assert "blocked" in reason.lower() or "loopback" in reason.lower() or "private" in reason.lower()
 
 
+def test_ssrf_blocks_dns_rebinding():
+    """Verify SSRF blocks domain names that resolve to local loopback addresses."""
+    rebinding_urls = [
+        "http://127.0.0.1.nip.io/admin",
+    ]
+    for url in rebinding_urls:
+        is_safe, reason = is_safe_webhook_url(url)
+        assert is_safe is False
+        assert "blocked" in reason.lower() or "rebinding" in reason.lower() or "private" in reason.lower()
+
+
+
 def test_ssrf_allows_valid_public_apis():
     """Verify that public HTTPS APIs are properly permitted."""
     valid_urls = [
