@@ -125,15 +125,26 @@ class SlidingWindowRateLimiter:
         window_start = now - 60.0
 
         # Clean old timestamps outside the 60s sliding window
-        self.requests[client_ip] = [ts for ts in self.requests[client_ip] if ts > window_start]
+        valid_ts = [ts for ts in self.requests[client_ip] if ts > window_start]
+        if not valid_ts:
+            self.requests.pop(client_ip, None)
+        else:
+            self.requests[client_ip] = valid_ts
 
-        if len(self.requests[client_ip]) >= self.max_requests:
-            # Calculate time until earliest timestamp expires
+        # Periodic dictionary pruning to prevent unbounded RAM growth under IP scans
+        if len(self.requests) > 5000:
+            stale_keys = [ip for ip, tss in self.requests.items() if not tss or tss[-1] <= window_start]
+            for ip in stale_keys:
+                self.requests.pop(ip, None)
+
+        if len(self.requests.get(client_ip, [])) >= self.max_requests:
             earliest = self.requests[client_ip][0]
             retry_after = max(1, int(60.0 - (now - earliest)))
             return False, retry_after
 
         # Record this request
+        if client_ip not in self.requests:
+            self.requests[client_ip] = []
         self.requests[client_ip].append(now)
         return True, 0
 

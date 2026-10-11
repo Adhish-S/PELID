@@ -64,14 +64,32 @@ app = FastAPI(
     version="1.1.0",
 )
 
-# Enable CORS for dashboard and enterprise frontends
+# Enterprise CORS Configuration
+ALLOWED_ORIGINS = os.getenv(
+    "PELID_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080",
+).split(",")
+ALLOWED_ORIGINS = [o.strip() for o in ALLOWED_ORIGINS if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=ALLOWED_ORIGINS if "*" not in ALLOWED_ORIGINS else ["*"],
+    allow_credentials=True if "*" not in ALLOWED_ORIGINS else False,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Inject enterprise hardening security headers into every gateway response."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
 
 # Sliding window rate limiter (configurable per client IP)
 rate_limiter = SlidingWindowRateLimiter(max_requests_per_minute=RATE_LIMIT_PER_MINUTE)
@@ -602,15 +620,34 @@ async def chat_completions(request: Request):
     last_message_content = messages[-1].get("content", "") if messages else ""
     token_count = count_tokens(last_message_content)
 
-    # Step 0D: Prompt Injection Shield
+    # Step 0D: Prompt Injection Shield (Denial of Wallet & Jailbreak Defense)
     if ENABLE_INJECTION_SHIELD:
         is_inj, inj_reason = is_prompt_injection(last_message_content)
         if is_inj:
-            print(f"  [SECURITY SHIELD] Intercepted adversarial prompt: {inj_reason}")
-            return await forward_to_upstream(
-                body, request, last_message_content, t0,
-                intent="prompt_injection_blocked", confidence=1.0, language="en", reason="Adversarial / Injection Detected",
-                tenant_id=tenant_id
+            latency_ms = (time.perf_counter() - t0) * 1000
+            print(f"  [SECURITY SHIELD] Blocked adversarial prompt locally ($0.00): {inj_reason}")
+            log_request(
+                query=last_message_content,
+                intent="prompt_injection_blocked",
+                confidence=1.0,
+                language="en",
+                path="A",
+                latency_ms=latency_ms,
+                tokens_prompt=token_count,
+                tokens_completion=0,
+                tokens_saved=token_count + 50,
+                reason="Adversarial Injection Blocked at Gateway",
+                tenant_id=tenant_id,
+            )
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": {
+                        "message": "Request blocked by Pelid Security Shield: adversarial prompt or jailbreak pattern detected.",
+                        "type": "prompt_injection_detected",
+                        "code": "adversarial_payload",
+                    }
+                },
             )
 
     # Detect language early for cache and routing
@@ -618,7 +655,7 @@ async def chat_completions(request: Request):
 
     # Step 1: Sub-Millisecond Level 1 Exact Cache Lookup (<0.05ms)
     cache = get_cache()
-    cached = cache.get_exact(last_message_content, language)
+    cached = cache.get_exact(last_message_content, language, tenant_id=tenant_id)
     if cached:
         latency_ms = (time.perf_counter() - t0) * 1000
         log_request(
@@ -732,7 +769,7 @@ async def chat_completions(request: Request):
 
     # Step 6: Sub-Millisecond Level 2 Semantic Cache Lookup (<0.8ms)
     if result.embedding is not None:
-        sem_cached = cache.get_semantic(result.embedding, language, threshold=0.96)
+        sem_cached = cache.get_semantic(result.embedding, language, threshold=0.96, tenant_id=tenant_id)
         if sem_cached:
             latency_ms = (time.perf_counter() - t0) * 1000
             log_request(
@@ -854,6 +891,7 @@ async def chat_completions(request: Request):
             intent=result.label,
             confidence=result.confidence,
             tokens_saved=saved_tokens,
+            tenant_id=tenant_id,
         )
 
         log_request(

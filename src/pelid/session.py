@@ -7,6 +7,7 @@ follow-up questions ("When will it reach?", "Can you cancel it?") retain full co
 """
 
 import re
+import time
 from typing import Any, Optional
 from pelid.mock_crm import extract_order_id
 
@@ -25,9 +26,11 @@ class SessionContext:
         self.context_slots: dict[str, Any] = {}
         self.turn_count: int = 0
         self.history: list[dict[str, str]] = []
+        self.last_accessed: float = time.time()
 
     def update_slots_from_text(self, text: str):
         """Scan text and update persistent slots like Order ID."""
+        self.last_accessed = time.time()
         found_order = extract_order_id(text)
         if found_order:
             self.active_order_id = found_order
@@ -35,12 +38,14 @@ class SessionContext:
 
     def set_pending(self, intent: str, missing_slots: list[str], language: str = "en"):
         """Record a pending intent that is awaiting missing slots from the user."""
+        self.last_accessed = time.time()
         self.pending_intent = intent
         self.pending_slots = list(missing_slots)
         self.pending_language = language
 
     def clear_pending(self):
         """Clear any pending slot-filling state."""
+        self.last_accessed = time.time()
         self.pending_intent = None
         self.pending_slots = []
         self.pending_language = "en"
@@ -51,6 +56,7 @@ class SessionContext:
 
     def add_turn(self, role: str, content: str):
         """Append message turn and update slots."""
+        self.last_accessed = time.time()
         self.turn_count += 1
         self.update_slots_from_text(content)
         self.history.append({"role": role, "content": content})
@@ -58,19 +64,56 @@ class SessionContext:
             self.history = self.history[-10:]
 
 
-class SessionStore:
-    """In-memory thread-safe store for active conversation sessions."""
+MAX_SESSIONS = 5000
+DEFAULT_SESSION_TTL = 3600.0  # 1 hour expiration
 
-    def __init__(self):
+
+class SessionStore:
+    """In-memory thread-safe store for active conversation sessions with TTL and LRU bounds."""
+
+    def __init__(self, max_sessions: int = MAX_SESSIONS, ttl_seconds: float = DEFAULT_SESSION_TTL):
         self._sessions: dict[str, SessionContext] = {}
+        self.max_sessions = max_sessions
+        self.ttl_seconds = ttl_seconds
+        self._last_cleanup = time.time()
+
+    def _cleanup_expired(self):
+        """Prune expired sessions older than TTL."""
+        now = time.time()
+        if now - self._last_cleanup < 60.0 and len(self._sessions) < self.max_sessions:
+            return
+
+        self._last_cleanup = now
+        expired_keys = [
+            sid for sid, sess in self._sessions.items()
+            if now - sess.last_accessed > self.ttl_seconds
+        ]
+        for sid in expired_keys:
+            del self._sessions[sid]
+
+        if len(self._sessions) >= self.max_sessions:
+            sorted_keys = sorted(self._sessions.keys(), key=lambda k: self._sessions[k].last_accessed)
+            to_remove = sorted_keys[: len(self._sessions) - self.max_sessions + 10]
+            for sid in to_remove:
+                del self._sessions[sid]
 
     def get_or_create(self, session_id: str) -> SessionContext:
-        """Get existing session context or create a new one."""
+        """Get existing session context or create a new one with TTL tracking."""
         if not session_id:
             session_id = "default_session"
+
+        # Transient single-turn requests do not occupy long-term session RAM
+        if session_id.startswith("stateless_"):
+            return SessionContext(session_id)
+
+        self._cleanup_expired()
+
         if session_id not in self._sessions:
             self._sessions[session_id] = SessionContext(session_id)
-        return self._sessions[session_id]
+
+        session = self._sessions[session_id]
+        session.last_accessed = time.time()
+        return session
 
     def clear(self):
         """Clear all session states."""

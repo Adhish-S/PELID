@@ -30,7 +30,7 @@ def normalize_query(text: str) -> str:
 
 
 class CacheEntry:
-    """A single cached entry with exact string, embedding, and response payload."""
+    """A single cached entry with exact string, embedding, response payload, and tenant isolation."""
 
     def __init__(
         self,
@@ -42,6 +42,7 @@ class CacheEntry:
         intent: str,
         confidence: float,
         tokens_saved: int,
+        tenant_id: str = "default",
     ):
         self.query = query
         self.normalized = normalized
@@ -51,12 +52,13 @@ class CacheEntry:
         self.intent = intent
         self.confidence = confidence
         self.tokens_saved = tokens_saved
+        self.tenant_id = tenant_id
         self.hit_count = 0
         self.last_accessed = time.time()
 
 
 class SemanticCache:
-    """In-memory dual-level LRU cache with exact and cosine similarity matching."""
+    """In-memory dual-level LRU cache with strict tenant isolation, exact, and cosine similarity matching."""
 
     def __init__(self, max_entries: int = MAX_CACHE_ENTRIES):
         self.max_entries = max_entries
@@ -66,15 +68,15 @@ class SemanticCache:
         self.exact_hits = 0
         self.semantic_hits = 0
 
-    def _make_key(self, normalized: str, language: str) -> str:
-        raw = f"{language}:{normalized}"
+    def _make_key(self, normalized: str, language: str, tenant_id: str = "default") -> str:
+        raw = f"{tenant_id}:{language}:{normalized}"
         return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
-    def get_exact(self, query: str, language: str) -> Optional[dict[str, Any]]:
-        """Level 1: Lightning-fast exact hash lookup (<0.05ms)."""
+    def get_exact(self, query: str, language: str, tenant_id: str = "default") -> Optional[dict[str, Any]]:
+        """Level 1: Lightning-fast exact hash lookup (<0.05ms) with tenant isolation."""
         self.total_lookups += 1
         norm = normalize_query(query)
-        key = self._make_key(norm, language)
+        key = self._make_key(norm, language, tenant_id)
 
         entry = self.exact_map.get(key)
         if entry:
@@ -96,13 +98,17 @@ class SemanticCache:
         embedding: np.ndarray,
         language: str,
         threshold: float = DEFAULT_SIMILARITY_THRESHOLD,
+        tenant_id: str = "default",
     ) -> Optional[dict[str, Any]]:
-        """Level 2: Cosine similarity search over cached embeddings in the same language (<0.8ms)."""
+        """Level 2: Cosine similarity search over cached embeddings with strict tenant isolation (<0.8ms)."""
         if not self.entries or embedding is None:
             return None
 
-        # Filter candidate entries by matching language and having embeddings
-        candidates = [e for e in self.entries if e.language == language and e.embedding is not None]
+        # Filter candidate entries by matching tenant, language, and having embeddings
+        candidates = [
+            e for e in self.entries
+            if e.tenant_id == tenant_id and e.language == language and e.embedding is not None
+        ]
         if not candidates:
             return None
 
@@ -151,18 +157,19 @@ class SemanticCache:
         intent: str,
         confidence: float,
         tokens_saved: int,
+        tenant_id: str = "default",
     ):
-        """Insert or update a resolved item in the cache."""
+        """Insert or update a resolved item in the cache under tenant namespace."""
         norm = normalize_query(query)
         if not norm or len(norm) < 3:
             return
 
-        key = self._make_key(norm, language)
+        key = self._make_key(norm, language, tenant_id)
 
         # Evict oldest entry if at capacity
         if len(self.entries) >= self.max_entries:
             oldest = min(self.entries, key=lambda e: e.last_accessed)
-            oldest_key = self._make_key(oldest.normalized, oldest.language)
+            oldest_key = self._make_key(oldest.normalized, oldest.language, oldest.tenant_id)
             self.exact_map.pop(oldest_key, None)
             self.entries.remove(oldest)
 
@@ -178,6 +185,7 @@ class SemanticCache:
             intent=intent,
             confidence=confidence,
             tokens_saved=tokens_saved,
+            tenant_id=tenant_id,
         )
 
         self.exact_map[key] = entry
